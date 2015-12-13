@@ -30,7 +30,7 @@ def article(article):
 	command = 'render_template("article.html"'
 	for tag in script.keys():
 		command += ', ' + tag + ' = script["' + tag + '"]'
-	command += ', MathJax=False, HighlightJS=True)'
+	command += ')'
 	return eval(command)
 
 @app.errorhandler(404)
@@ -39,3 +39,4 @@ def page_not_found(error):
 
 if __name__ == '__main__':
     app.run(debug=True)
+    

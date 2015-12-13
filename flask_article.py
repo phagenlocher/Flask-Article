@@ -6,6 +6,12 @@ from datetime import date
 TEMPLATER_NEWLINE = 'FLASKTEMPLATERNEWLINE'
 
 def get_script_info(script, script_folder = '/scripts'):
+	'''Open a script and parse its content 
+
+	Keyword arguments:
+	script -- script name
+	script_folder -- the directory for the script (default '/scripts')
+	'''
 	script_info = {}
 	script_info['Filename'] = script
 	data = open(os.getcwd() + '/' + script_folder + '/' + script).read()
@@ -42,19 +48,31 @@ def get_script_info(script, script_folder = '/scripts'):
 		
 	return script_info
 
-def get_scripts(script_folder = '/scripts'):
+def get_scripts(script_folder = '/scripts', sort=True):
+	'''Get all the scripts from the script directory and optionally sort them
+
+	Keyword arguments:
+	script_folder -- the directory for the scripts (default '/scripts')
+	sort -- if the scripts should be sorted by date (default True)
+	'''
 	script_infos = []
 	files = os.listdir( os.getcwd() + script_folder )
 	for script in files:
 		info = get_script_info(script, script_folder)
 		if info is not None:
 			script_infos.append(info)
-	script_infos.sort(reverse=True, key=lambda x : x['Date_object'])
+	if sort:
+		script_infos.sort(reverse=True, key=lambda x : x['Date_object'])
 	return script_infos
 
-def generate_toc(content):
+def generate_toc(content, numbered=True):
+	'''Generates a table of contents and modifies an articles content
+
+	Keyword arguments:
+	content -- the content to parse
+	numbered -- if the sections should be numbered (default True)
+	'''
 	script = content.split(TEMPLATER_NEWLINE)
-	NUMBERED = True
 	
 	sections = []
 	section_num = 0
@@ -83,7 +101,7 @@ def generate_toc(content):
 	content = ""		
 	for sec_list in sections:
 		for sec in sec_list:
-			if NUMBERED:
+			if numbered:
 				sec_name = str(sec[2]) + " - " + sec[0]
 			else:
 				sec_name = sec[0]
@@ -110,7 +128,7 @@ def generate_toc(content):
 		if len(sec_list) == 1:
 				single = True
 		for sec in sec_list:
-			if NUMBERED:
+			if numbered:
 				sec_name = str(sec[2]) + " - " + sec[0]
 			else:
 				sec_name = sec[0]
@@ -125,6 +143,11 @@ def generate_toc(content):
 	return toc, content
 
 def get_article_list(format_string='{} - {}'):
+	'''Get a list of html-links to all the articles
+
+	Keyword arguments:
+	format_string -- the string to use as a template for creating links to the articles
+	'''
 	scripts = get_scripts()
 	article_html = '';
 	for info in scripts:
