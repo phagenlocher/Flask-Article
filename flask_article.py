@@ -5,6 +5,20 @@ from datetime import date
 
 TEMPLATER_NEWLINE = 'FLASKTEMPLATERNEWLINE'
 
+def get_single_script(script, script_folder = '/scripts'):
+	'''Opens single script and parses it so it can be used with a html template
+
+	Keyword arguments:
+	script -- script name
+	script_folder -- the directory for the script (default '/scripts')
+	'''
+	script = get_script_info(script, script_folder)
+	if script == None:
+		return None
+	
+	script['TableOfContents'], script['Content']  = generate_toc(script['Content'])
+	return script
+
 def get_script_info(script, script_folder = '/scripts'):
 	'''Open a script and parse its content 
 
@@ -14,6 +28,11 @@ def get_script_info(script, script_folder = '/scripts'):
 	'''
 	script_info = {}
 	script_info['Filename'] = script
+
+	# The file couldn't be found
+	if not script in os.listdir(os.getcwd() + '/' + script_folder):
+		return None
+
 	data = open(os.getcwd() + '/' + script_folder + '/' + script).read()
 	data = data.split('\n')
 	try:
