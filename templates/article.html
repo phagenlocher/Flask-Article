@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>{{ Title }}</title>
+<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/normalize.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/app.css') }}"/>
+<meta charset="UTF-8">
+<meta name="description" content="{{ Description }}">
+<meta name="keywords" content="{{ Keywords }}">
+<meta name="author" content="{{ Author }}">
+<meta property="og:title" content="{{ Title }}">
+<meta property="og:description" content="{{ Description }}">
+</head>
+<body>
+<h1>{{ Title }}</h1>
+<table>
+<tr>
+<td style="text-align: left;"><a href="/"><h4>by {{ Author }}</h4></a></td>
+<td style="text-align: right;"><h4>{{ Date }}</h4></td>
+</tr>
+</table>
+<hr>
+<h4>Table of Contents</h4>
+{{ TableOfContents|safe }}		
+{{ Content|safe }}		
+<hr>
+<table class="notice">
+<tr>
+<td style="text-align: left;"><a href="/contact">Contact and legal information</a></td>
+<td style="text-align: center;"><a href="/">Homepage</a></td>
+<td style="text-align: right;">Last edited on {{ Date }}</td>
+</tr>
+</table>
+</br></br>
+</body>
+</html>
+

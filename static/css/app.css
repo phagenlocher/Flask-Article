@@ -1,0 +1,89 @@
+body {
+	
+	background-color: #252839;
+	color: #b5b5b7;
+	margin-left: 21%;
+	margin-right: 21%;
+	font-family: OpenSans, Helvetica;
+
+}
+
+p  {
+
+	word-wrap: break-word;
+
+}
+
+h1 {
+
+	margin-bottom: -10px;
+	font-family: Roboto;
+
+}
+
+h2, h3, h4, h5 {
+
+	color: #f2b632;
+	margin-bottom: -0px;
+	font-family: Roboto;
+
+}
+
+pre {
+
+	margin: 10px 0px;
+	color: white;
+
+}
+
+a {
+	
+	color: #677077;
+	text-decoration: none;
+	transition: color 0.3s;
+	
+}
+
+a:hover {
+	
+	color: white;
+	
+}
+
+img {
+	
+	max-width: 100%;
+	
+}
+
+table {
+	
+	width: 100%;
+	text-align: center;
+	
+}
+
+td {
+
+	vertical-align: top;
+
+}
+
+.toc {
+	
+	font-size: 13px;
+	
+}
+
+.notice {
+
+	font-size: 13px;
+	color: grey;
+
+}
+
+.hljs {
+
+	background-color: #252839;
+
+}
