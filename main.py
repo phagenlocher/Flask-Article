@@ -2,13 +2,14 @@
 
 from flask import Flask
 from flask import render_template
-from flask_article import *
+from flask_article import ScriptLoader
 
 app = Flask(__name__)
+sl = ScriptLoader()
 
 @app.route('/')
 def index():
-	articles = get_article_list()
+	articles = sl.get_article_list()
 	return render_template("index.html", Articles=articles)
 
 @app.route('/contact')
@@ -17,7 +18,7 @@ def contact():
 
 @app.route('/<article>')
 def article(article):
-	script = get_single_script(article)
+	script = sl.get_single_script(article)
 	if script == None:
 		page_not_found()
 
