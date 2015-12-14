@@ -20,7 +20,7 @@ def contact():
 def article(article):
 	script = sl.get_single_script(article)
 	if script == None:
-		page_not_found()
+		return page_not_found()
 
 	command = 'render_template("article.html"'
 	for tag in script.keys():

@@ -3,10 +3,17 @@
 import os
 from datetime import date
 
-TEMPLATER_NEWLINE = 'FLASKTEMPLATERNEWLINE'
+TEMPLATE_NEWLINE = 'FLASK_ARTICLE_NEWLINE'
 
 class ScriptLoader():
+	'''Loader for the scripts
+	'''
 	def __init__(self, script_folder='/scripts'):
+		'''Constructor
+
+		Keyword arguments:
+		script_folder -- the directory for your scripts (default '/scripts')
+		'''
 		self.script_folder = script_folder
 
 	def get_single_script(self, script):
@@ -15,14 +22,14 @@ class ScriptLoader():
 		Keyword arguments:
 		script -- script name
 		'''
-		script = self.get_script_info(script)
+		script = self.__get_script_info__(script)
 		if script == None:
 			return None
 		
-		script['TableOfContents'], script['Content']  = self.generate_toc(script['Content'])
+		script['TableOfContents'], script['Content']  = self.__generate_toc__(script['Content'])
 		return script
 
-	def get_script_info(self, script):
+	def __get_script_info__(self, script):
 		'''Open a script and parse its content 
 		If the script is faulty, None is returned
 
@@ -48,7 +55,7 @@ class ScriptLoader():
 			data.remove('')
 			
 		tags = data[:i-1]
-		script_info['Content'] = TEMPLATER_NEWLINE.join(data[i:]).replace("\\\\", "</br>")
+		script_info['Content'] = TEMPLATE_NEWLINE.join(data[i:]).replace("\\\\", "</br>")
 		
 		for tag in tags:
 			tag_name = tag[ tag.find('{')+1 : tag.find('}') ]
@@ -73,7 +80,7 @@ class ScriptLoader():
 			
 		return script_info
 
-	def get_scripts(self, sort=True, key='Date_object'):
+	def __get_scripts__(self, sort=True, key='Date_object'):
 		'''Get all the scripts from the script directory and optionally sort them
 
 		Keyword arguments:
@@ -83,21 +90,21 @@ class ScriptLoader():
 		script_infos = []
 		files = os.listdir( os.getcwd() + self.script_folder )
 		for script in files:
-			info = self.get_script_info(script)
+			info = self.__get_script_info__(script)
 			if info is not None:
 				script_infos.append(info)
 		if sort:
 			script_infos.sort(reverse=True, key=lambda x : x[key])
 		return script_infos
 
-	def generate_toc(self, content, numbered=True):
+	def __generate_toc__(self, content, numbered=True):
 		'''Generates a table of contents and modifies an articles content
 
 		Keyword arguments:
 		content -- the content to parse
 		numbered -- if the sections should be numbered (default True)
 		'''
-		script = content.split(TEMPLATER_NEWLINE)
+		script = content.split(TEMPLATE_NEWLINE)
 		
 		sections = []
 		section_num = 0
@@ -175,7 +182,7 @@ class ScriptLoader():
 		sort -- if the scripts should be sorted by date (default True)
 		key -- the key to sort after (default 'Date_object')
 		'''
-		scripts = self.get_scripts(sort, key)
+		scripts = self.__get_scripts__(sort, key)
 		article_html = '';
 		for info in scripts:
 			article_html += '<a href="/' + info['Filename'] + '">' \
