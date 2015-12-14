@@ -12,8 +12,8 @@ The functions use the dict-datatype to return the parsed contents.
 For usual usage you should use the ScriptLoader:
 ```python
 sl = ScriptLoader()
-script = sl.get_single_script(article)
-rendered_article = sl.render_article(script, 'article.html')
+script = sl.get_single_script(<script filename>)
+rendered_article = sl.render_article(script, <template filename>)
 ```
 You then can return the rendered article in your function when using Flask.
 
