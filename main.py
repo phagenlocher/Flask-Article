@@ -10,7 +10,7 @@ sl = ScriptLoader()
 @app.route('/')
 def index():
 	articles = sl.get_article_list()
-	return render_template("index.html", Articles=articles)
+	return render_template('index.html', Articles=articles)
 
 @app.route('/contact')
 def contact():
@@ -26,7 +26,7 @@ def article(article):
 
 @app.errorhandler(404)
 def page_not_found(error=None):
-    return render_template("404.html"), 404
+    return render_template('404.html'), 404
 
 if __name__ == '__main__':
     app.run(debug=True)

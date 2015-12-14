@@ -24,7 +24,7 @@ class ScriptLoader():
 		e.g.
 		Your tags are "Author", "Title" and "Date".
 		The resulting command will be:
-		render_template(<filename>, Author = script["Author"], Title = script["Title"], Date = script["Date"]
+		render_template(<filename>, Author = script["Author"], Title = script["Title"], Date = script["Date"])
 
 		Keyword arguments:
 		script -- parsed script
