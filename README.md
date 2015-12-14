@@ -2,7 +2,7 @@
 
 ## What does it do?
 
-**flask-article** is a small set of functions to load scripts in an easy-to-use format in order to create articles or blog-posts without using a database.
+**flask-article** is a small set of functions to load scripts in an easy-to-use format in order to create articles or blog-posts without using a database. Even though it creates html code that is independent of *Flask* it is made to be used with it!
 
 ## Usage
 
