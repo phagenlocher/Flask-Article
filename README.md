@@ -2,16 +2,17 @@
 
 ## What does it do?
 
-**flask-article** is a small set of functions to load scripts in an easy-to-use format in order to create articles or blog-posts without using a database. Even though it creates html code that is independent of *Flask* it is made to be used with it!
+**flask-article** is a microscopic library to load scripts in an easy-to-use format in order to create articles or blog-posts without using a database. Even though it creates html code that is independent of *Flask* it is made to be used with it!
 
 ## Usage
 
 By default, flask-article uses the directory **/scripts** to load the scripts for inserting the content into a HTML-template.
 
 The functions use the dict-datatype to return the parsed contents.
-For usual usage you should use:
+For usual usage you should use the ScriptLoader:
 ```python
-script = get_single_script(article)
+sl = ScriptLoader()
+script = sl.get_single_script(article)
 ```
 
 The keys to use from the resulting dict are:
@@ -35,7 +36,7 @@ When using the values of the dict to insert into your Jinja2-Template you have t
 ```
 If you want to offer a list of all the articles to your users you can use:
 ```python
-articles = get_article_list()
+articles = sl.get_article_list()
 ```
 This time the return value is **HTML-code** so don't escape it.
 
