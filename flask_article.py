@@ -39,7 +39,6 @@ class ScriptLoader():
 		h = sha1(open(self.script_folder + '/' + name, 'rb').read()).digest()
 		content = h + CACHE_SEPERATOR.encode() + content.encode()
 		cache_entry.write(content)
-		cache_entry.close()
 
 	def __check_cache_entry__(self, name):
 		'''Checks with the hash of a cache entry if a script has changed'''
@@ -88,7 +87,7 @@ class ScriptLoader():
 		# Checking cache entry
 		if not self.__check_cache_entry__(script_name):
 			# Parsing file and creating new cache entry
-			script['TableOfContents'], script['Content'] = self.__generate_toc__(script['Content'])
+			script['TableOfContents'], script['Content'] = self.__parse_content__(script['Content'])
 			content = script['TableOfContents'] + CACHE_SEPERATOR + script['Content']
 			self.__new_cache_entry__(script_name, content)
 		else:
@@ -166,7 +165,7 @@ class ScriptLoader():
 			script_infos.sort(reverse=True, key=lambda x : x[key])
 		return script_infos
 
-	def __generate_toc__(self, content, numbered=True):
+	def __parse_content__(self, content, numbered=True):
 		'''Generates a table of contents and modifies an articles content
 
 		Keyword arguments:
