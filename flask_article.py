@@ -2,6 +2,7 @@
 
 import os
 from datetime import date
+from flask import render_template
 
 TEMPLATE_NEWLINE = 'FLASK_ARTICLE_NEWLINE'
 
@@ -16,27 +17,24 @@ class ScriptLoader():
 		'''
 		self.script_folder = script_folder
 
-	def generate_render_command(self, script, template_file, var_name='script'):
+	def render_article(self, script, template_file):
 		'''Generates a 'render_template' function call which sets all the tags
-		of your script.
+		of your script. Evaluates that call and returns it.
 
 		e.g.
 		Your tags are "Author", "Title" and "Date".
 		The resulting command will be:
-		render_template(<filename>, Author = script["Author"], Title = script["Author"], Date = script["Author"]
-
-		The command can be used with eval.
+		render_template(<filename>, Author = script["Author"], Title = script["Title"], Date = script["Date"]
 
 		Keyword arguments:
 		script -- parsed script
 		template_file -- filename of your template file
-		var_name -- the name of your variable (default 'script')
 		'''
 		func_call = 'render_template("' + template_file + '"'
 		for tag in script.keys():
 			func_call += ', ' + tag + ' = ' + var_name + '["' + tag + '"]'
 		func_call += ')'
-		return func_call
+		return eval(func_call)
 
 	def get_single_script(self, script):
 		'''Opens single script and parses it so it can be used with a html template

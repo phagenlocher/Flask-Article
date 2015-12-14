@@ -22,8 +22,7 @@ def article(article):
 	if script == None:
 		return page_not_found()
 
-	func_call = sl.generate_render_command(script, 'article.html')
-	return eval(func_call)
+	return sl.render_article(script, 'article.html')
 
 @app.errorhandler(404)
 def page_not_found(error=None):
