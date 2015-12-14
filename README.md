@@ -13,7 +13,9 @@ For usual usage you should use the ScriptLoader:
 ```python
 sl = ScriptLoader()
 script = sl.get_single_script(article)
+rendered_article = sl.render_article(script, 'article.html')
 ```
+You then can return the rendered article in your function when using Flask.
 
 The keys to use from the resulting dict are:
 
