@@ -14,7 +14,7 @@ def index():
 
 @app.route('/contact')
 def contact():
-    return 'Not done yet, dont sue'
+    return "Not done yet, don't sue"
 
 @app.route('/<article>')
 def article(article):
@@ -22,11 +22,8 @@ def article(article):
 	if script == None:
 		return page_not_found()
 
-	command = 'render_template("article.html"'
-	for tag in script.keys():
-		command += ', ' + tag + ' = script["' + tag + '"]'
-	command += ')'
-	return eval(command)
+	func_call = sl.generate_render_command(script, 'article.html')
+	return eval(func_call)
 
 @app.errorhandler(404)
 def page_not_found(error=None):

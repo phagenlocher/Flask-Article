@@ -16,6 +16,28 @@ class ScriptLoader():
 		'''
 		self.script_folder = script_folder
 
+	def generate_render_command(self, script, template_file, var_name='script'):
+		'''Generates a 'render_template' function call which sets all the tags
+		of your script.
+
+		e.g.
+		Your tags are "Author", "Title" and "Date".
+		The resulting command will be:
+		render_template(<filename>, Author = script["Author"], Title = script["Author"], Date = script["Author"]
+
+		The command can be used with eval.
+
+		Keyword arguments:
+		script -- parsed script
+		template_file -- filename of your template file
+		var_name -- the name of your variable (default 'script')
+		'''
+		func_call = 'render_template("' + template_file + '"'
+		for tag in script.keys():
+			func_call += ', ' + tag + ' = ' + var_name + '["' + tag + '"]'
+		func_call += ')'
+		return func_call
+
 	def get_single_script(self, script):
 		'''Opens single script and parses it so it can be used with a html template
 
