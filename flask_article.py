@@ -1,21 +1,60 @@
 #!/usr/bin/python3
 
 import os
+import shutil
 from datetime import date
 from flask import render_template
+from hashlib import sha1
 
 TEMPLATE_NEWLINE = 'FLASK_ARTICLE_NEWLINE'
+CACHE_SEPERATOR = '\n\0\n'
 
 class ScriptLoader():
-	'''Loader for the scripts
-	'''
-	def __init__(self, script_folder='/scripts'):
+	'''Loader for the scripts'''
+	def __init__(self, script_folder='scripts', cache_folder=".cache"):
 		'''Constructor
 
 		Keyword arguments:
 		script_folder -- the directory for your scripts (default '/scripts')
+		cache_folder -- the directory for cached files
 		'''
 		self.script_folder = script_folder
+		self.cache_folder = cache_folder
+		self.__create_new_cache_dir__()
+
+	def __create_new_cache_dir__(self):
+		'''Deletes the cache dir and creates a new empty one'''
+		if os.path.exists(self.cache_folder) and os.path.isdir(self.cache_folder):
+			shutil.rmtree(self.cache_folder)
+		os.mkdir(self.cache_folder)
+
+	def __new_cache_entry__(self, name, content):
+		'''Creates a new cache entry in the cache dir for a file
+
+		The entry saves a hash of the script and the parsed toc and content.
+		'''
+		if os.path.exists(self.cache_folder + '/' + name):
+			os.remove(self.cache_folder + '/' + name)
+		cache_entry = open(self.cache_folder + '/' + name, 'wb')
+		h = sha1(open(self.script_folder + '/' + name, 'rb').read()).digest()
+		content = h + CACHE_SEPERATOR.encode() + content.encode()
+		cache_entry.write(content)
+		cache_entry.close()
+
+	def __check_cache_entry__(self, name):
+		'''Checks with the hash of a cache entry if a script has changed'''
+		if not os.path.exists(self.cache_folder + '/' + name):
+			return False
+		cache_entry = open(self.cache_folder + '/' + name, 'rb').read()
+		# SHA1 hashlength is 20 bytes
+		cached_h = cache_entry[:20]
+		h = sha1(open(self.script_folder + '/' + name, 'rb').read()).digest()
+		return h == cached_h
+
+	def __get_cached_content__(self, name):
+		cache_entry = open(self.cache_folder + '/' + name, 'rb').read()
+		cache_entry = cache_entry.split(CACHE_SEPERATOR.encode())
+		return cache_entry[1].decode(), cache_entry[2].decode()
 
 	def render_article(self, script, template_file):
 		'''Generates a 'render_template' function call which sets all the tags
@@ -36,17 +75,27 @@ class ScriptLoader():
 		func_call += ')'
 		return eval(func_call)
 
-	def get_single_script(self, script):
+	def get_single_script(self, script_name):
 		'''Opens single script and parses it so it can be used with a html template
 
 		Keyword arguments:
-		script -- script name
+		script_name -- script name
 		'''
-		script = self.__get_script_info__(script)
+		script = self.__get_script_info__(script_name)
 		if script == None:
 			return None
 		
-		script['TableOfContents'], script['Content']  = self.__generate_toc__(script['Content'])
+		# Checking cache entry
+		if not self.__check_cache_entry__(script_name):
+			# Parsing file and creating new cache entry
+			script['TableOfContents'], script['Content'] = self.__generate_toc__(script['Content'])
+			content = script['TableOfContents'] + CACHE_SEPERATOR + script['Content']
+			self.__new_cache_entry__(script_name, content)
+		else:
+			# Loading parsed contents
+			print("Loaded {} from cache".format(script_name))
+			script['TableOfContents'], script['Content'] = self.__get_cached_content__(script_name)
+
 		return script
 
 	def __get_script_info__(self, script):
@@ -108,7 +157,7 @@ class ScriptLoader():
 		key -- the key to sort after (default 'Date_object')
 		'''
 		script_infos = []
-		files = os.listdir( os.getcwd() + self.script_folder )
+		files = os.listdir( os.getcwd() + '/' +  self.script_folder )
 		for script in files:
 			info = self.__get_script_info__(script)
 			if info is not None:
@@ -191,7 +240,7 @@ class ScriptLoader():
 				if sec_list.index(sec) == len(sec_list)-1:
 					if not single:
 						toc += "</ul>\n"
-		toc += "</ul>\n"
+		toc += "</ul>"
 		return toc, content
 
 	def get_article_list(self, format_string='{} - {}', sort=True, key='Date_object'):
