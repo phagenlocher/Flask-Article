@@ -21,6 +21,7 @@ def get_single_script(script, script_folder = '/scripts'):
 
 def get_script_info(script, script_folder = '/scripts'):
 	'''Open a script and parse its content 
+	If the script is faulty, None is returned
 
 	Keyword arguments:
 	script -- script name
@@ -32,6 +33,7 @@ def get_script_info(script, script_folder = '/scripts'):
 	# The file couldn't be found
 	if not script in os.listdir(os.getcwd() + '/' + script_folder):
 		return None
+
 
 	data = open(os.getcwd() + '/' + script_folder + '/' + script).read()
 	data = data.split('\n')
@@ -56,9 +58,11 @@ def get_script_info(script, script_folder = '/scripts'):
 	for rt in required_tags:
 		if not rt in script_info.keys():
 			return None
+		# Make the title titlecased
 		if rt == 'Title':
 			if not script_info['Title'].startswith('_'):
 				script_info['Title'] = script_info['Title'].title()
+		# Create a date-object (later used for sorting)
 		if rt == 'Date':
 			d = script_info['Date'].split('/')
 			d = date(day=int(d[0]), month=int(d[1]), year=int(d[2]))
@@ -67,12 +71,13 @@ def get_script_info(script, script_folder = '/scripts'):
 		
 	return script_info
 
-def get_scripts(script_folder = '/scripts', sort=True):
+def get_scripts(script_folder = '/scripts', sort=True, key='Date_object'):
 	'''Get all the scripts from the script directory and optionally sort them
 
 	Keyword arguments:
 	script_folder -- the directory for the scripts (default '/scripts')
 	sort -- if the scripts should be sorted by date (default True)
+	key -- the key to sort after (default 'Date_object')
 	'''
 	script_infos = []
 	files = os.listdir( os.getcwd() + script_folder )
@@ -81,7 +86,7 @@ def get_scripts(script_folder = '/scripts', sort=True):
 		if info is not None:
 			script_infos.append(info)
 	if sort:
-		script_infos.sort(reverse=True, key=lambda x : x['Date_object'])
+		script_infos.sort(reverse=True, key=lambda x : x[key])
 	return script_infos
 
 def generate_toc(content, numbered=True):
@@ -161,13 +166,16 @@ def generate_toc(content, numbered=True):
 	toc += "</ul>\n"
 	return toc, content
 
-def get_article_list(format_string='{} - {}'):
+def get_article_list(format_string='{} - {}', script_folder='/scripts', sort=True, key='Date_object'):
 	'''Get a list of html-links to all the articles
 
 	Keyword arguments:
-	format_string -- the string to use as a template for creating links to the articles
+	format_string -- the string to use as a template for creating links to the articles (default '{} - {}')
+	script_folder -- the directory for the scripts (default '/scripts')
+	sort -- if the scripts should be sorted by date (default True)
+	key -- the key to sort after (default 'Date_object')
 	'''
-	scripts = get_scripts()
+	scripts = get_scripts(script_folder, sort, key)
 	article_html = '';
 	for info in scripts:
 		article_html += '<a href="/' + info['Filename'] + '">' \
