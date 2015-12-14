@@ -75,5 +75,4 @@ You can use HTML-code within the scripts.
 
 ## Planned features
 
-* Caching created HTML-code
 * Compatibility to Markdown
