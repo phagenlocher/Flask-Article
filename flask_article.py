@@ -32,7 +32,7 @@ class ScriptLoader():
 		'''
 		func_call = 'render_template("' + template_file + '"'
 		for tag in script.keys():
-			func_call += ', ' + tag + ' = ' + var_name + '["' + tag + '"]'
+			func_call += ', ' + tag + ' = script["' + tag + '"]'
 		func_call += ')'
 		return eval(func_call)
 
