@@ -2,9 +2,9 @@
 
 import os
 import shutil
+import hashlib as hl
 from datetime import date
 from flask import render_template
-from hashlib import sha1
 
 # TODO find better newline
 TEMPLATE_NEWLINE = 'FLASK_ARTICLE_NEWLINE'
@@ -16,7 +16,7 @@ class CacheHandler():
 	It uses 2 caches, the heap (limited) and the diskspace.
 	The last cached scripts are the ones in heap.
 	'''
-	def __init__(self, cache_limit=10, script_folder='scripts', cache_folder='.cache', debug=True):
+	def __init__(self, cache_limit=1, script_folder='scripts', cache_folder='.cache', debug=True, hash_alg='sha1'):
 		'''Constructor
 
 		Keyword arguments:
@@ -25,7 +25,6 @@ class CacheHandler():
 		cache_folder -- the directory for cached files (default '.cache')
 		debug -- specefies wether the handler will output debug information (default True)
 		'''
-		# TODO replaceable hashalg
 		# TODO function docs
 		# TODO test performance
 		self.cache_limit = cache_limit
@@ -33,6 +32,15 @@ class CacheHandler():
 		self.cache_folder = cache_folder
 		self.debug = debug
 		self.heap_cache = {}
+
+		if hash_alg in hl.algorithms_available:
+			self.hash_alg = hash_alg
+		else:
+			self.report('The hash algorithm "' + hash_alg + '" is not available'\
+				' on this system! (Using SHA1 instead)')
+			self.hash_alg = 'sha1'
+		self.hash_size = hl.new(self.hash_alg).digest_size
+
 		self.create_new_cache_dir()
 
 	def report(self, data):
@@ -41,7 +49,7 @@ class CacheHandler():
 
 	def create_new_cache_dir(self):
 		'''Deletes the cache dir and creates a new empty one'''
-		self.report("Renewing cache dir")
+		self.report('Renewing cache dir')
 		if os.path.exists(self.cache_folder) and os.path.isdir(self.cache_folder):
 			shutil.rmtree(self.cache_folder)
 		os.mkdir(self.cache_folder)
@@ -58,7 +66,8 @@ class CacheHandler():
 		if os.path.exists(cache_path):
 			os.remove(cache_path)
 		cache_entry = open(cache_path, 'wb')
-		h = sha1(open(self.script_folder + '/' + name, 'rb').read()).digest()
+		file_data = open(self.script_folder + '/' + name, 'rb').read()
+		h = hl.new(self.hash_alg, file_data).digest()
 		disk_content = h + CACHE_SEPERATOR.encode() + disk_content.encode()
 		cache_entry.write(disk_content)
 
@@ -74,7 +83,8 @@ class CacheHandler():
 
 	def check_cache_entry(self, name):
 		'''Checks with the hash of a cache entry if a script has changed'''
-		h = sha1(open(self.script_folder + '/' + name, 'rb').read()).digest()
+		file_data = open(self.script_folder + '/' + name, 'rb').read()
+		h = hl.new(self.hash_alg, file_data).digest()
 		if name in self.heap_cache:
 			# Check cache entry in heap
 			cached_h = self.heap_cache[name][0]
@@ -84,8 +94,7 @@ class CacheHandler():
 			if not os.path.exists(cache_path):
 				# The cache entry does not exist
 				return False
-			# SHA1 hashlength is 20 bytes
-			cached_h = open(cache_path, 'rb').read(20)
+			cached_h = open(cache_path, 'rb').read(self.hash_size)
 		return h == cached_h
 
 	def get_cached_content(self, name):
