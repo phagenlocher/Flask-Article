@@ -6,54 +6,109 @@ from datetime import date
 from flask import render_template
 from hashlib import sha1
 
+# TODO find better newline
 TEMPLATE_NEWLINE = 'FLASK_ARTICLE_NEWLINE'
 CACHE_SEPERATOR = '\n\0\n'
 
-class ScriptLoader():
-	'''Loader for the scripts'''
-	def __init__(self, script_folder='scripts', cache_folder=".cache"):
+class CacheHandler():
+	'''Handler for caching files
+
+	It uses 2 caches, the heap (limited) and the diskspace.
+	The last cached scripts are the ones in heap.
+	'''
+	def __init__(self, cache_limit=10, script_folder='scripts', cache_folder='.cache', debug=True):
 		'''Constructor
 
 		Keyword arguments:
-		script_folder -- the directory for your scripts (default '/scripts')
-		cache_folder -- the directory for cached files
+		cache_limit -- how many files should be in heap-cache (default 10)
+		script_folder -- the directory for your scripts (default 'scripts')
+		cache_folder -- the directory for cached files (default '.cache')
+		debug -- specefies wether the handler will output debug information (default True)
 		'''
+		# TODO replaceable hashalg
+		# TODO function docs
+		# TODO test performance
+		self.cache_limit = cache_limit
 		self.script_folder = script_folder
 		self.cache_folder = cache_folder
-		self.__create_new_cache_dir__()
+		self.debug = debug
+		self.heap_cache = {}
+		self.create_new_cache_dir()
 
-	def __create_new_cache_dir__(self):
+	def report(self, data):
+		if self.debug:
+			print(data)
+
+	def create_new_cache_dir(self):
 		'''Deletes the cache dir and creates a new empty one'''
+		self.report("Renewing cache dir")
 		if os.path.exists(self.cache_folder) and os.path.isdir(self.cache_folder):
 			shutil.rmtree(self.cache_folder)
 		os.mkdir(self.cache_folder)
 
-	def __new_cache_entry__(self, name, content):
+	def new_cache_entry(self, name, toc, content):
 		'''Creates a new cache entry in the cache dir for a file
 
 		The entry saves a hash of the script and the parsed toc and content.
 		'''
-		if os.path.exists(self.cache_folder + '/' + name):
-			os.remove(self.cache_folder + '/' + name)
-		cache_entry = open(self.cache_folder + '/' + name, 'wb')
+		self.report("Creating new cache entry for " + name)
+		# Writing cache entry to disk
+		disk_content = toc + CACHE_SEPERATOR + content
+		cache_path = self.cache_folder + '/' + name
+		if os.path.exists(cache_path):
+			os.remove(cache_path)
+		cache_entry = open(cache_path, 'wb')
 		h = sha1(open(self.script_folder + '/' + name, 'rb').read()).digest()
-		content = h + CACHE_SEPERATOR.encode() + content.encode()
-		cache_entry.write(content)
+		disk_content = h + CACHE_SEPERATOR.encode() + disk_content.encode()
+		cache_entry.write(disk_content)
 
-	def __check_cache_entry__(self, name):
+		# Writing cache entry to heap
+		if len(self.heap_cache) < self.cache_limit:
+			pass
+		elif name in self.heap_cache:
+			pass
+		else:
+			# Delete the first entry in the cache to make room for the new one
+			del self.heap_cache[list(self.heap_cache.keys())[0]]
+		self.heap_cache[name] = (h, (toc, content))
+
+	def check_cache_entry(self, name):
 		'''Checks with the hash of a cache entry if a script has changed'''
-		if not os.path.exists(self.cache_folder + '/' + name):
-			return False
-		cache_entry = open(self.cache_folder + '/' + name, 'rb').read()
-		# SHA1 hashlength is 20 bytes
-		cached_h = cache_entry[:20]
 		h = sha1(open(self.script_folder + '/' + name, 'rb').read()).digest()
+		if name in self.heap_cache:
+			# Check cache entry in heap
+			cached_h = self.heap_cache[name][0]
+		else:
+			# Check cache entry on disk
+			cache_path = self.cache_folder + '/' + name
+			if not os.path.exists(cache_path):
+				# The cache entry does not exist
+				return False
+			# SHA1 hashlength is 20 bytes
+			cached_h = open(cache_path, 'rb').read(20)
 		return h == cached_h
 
-	def __get_cached_content__(self, name):
-		cache_entry = open(self.cache_folder + '/' + name, 'rb').read()
-		cache_entry = cache_entry.split(CACHE_SEPERATOR.encode())
-		return cache_entry[1].decode(), cache_entry[2].decode()
+	def get_cached_content(self, name):
+		if name in self.heap_cache:
+			self.report('Loaded {} from heap cache'.format(name))
+			return self.heap_cache[name][1]
+		else:
+			cache_entry = open(self.cache_folder + '/' + name, 'rb').read()
+			cache_entry = cache_entry.split(CACHE_SEPERATOR.encode())
+			self.report('Loaded {} from disk cache'.format(name))
+			return cache_entry[1].decode(), cache_entry[2].decode()
+
+class ScriptLoader():
+	'''Loader for the scripts'''
+	def __init__(self, script_folder='scripts', cache_folder='.cache'):
+		'''Constructor
+
+		Keyword arguments:
+		script_folder -- the directory for your scripts (default 'scripts')
+		cache_folder -- the directory for cached files
+		'''
+		self.script_folder = script_folder
+		self.cache_handler = CacheHandler(cache_folder = cache_folder)
 
 	def render_article(self, script, template_file):
 		'''Generates a 'render_template' function call which sets all the tags
@@ -85,15 +140,13 @@ class ScriptLoader():
 			return None
 		
 		# Checking cache entry
-		if not self.__check_cache_entry__(script_name):
+		if not self.cache_handler.check_cache_entry(script_name):
 			# Parsing file and creating new cache entry
 			script['TableOfContents'], script['Content'] = self.__parse_content__(script['Content'])
-			content = script['TableOfContents'] + CACHE_SEPERATOR + script['Content']
-			self.__new_cache_entry__(script_name, content)
+			self.cache_handler.new_cache_entry(script_name, script['TableOfContents'], script['Content'])
 		else:
 			# Loading parsed contents
-			print("Loaded {} from cache".format(script_name))
-			script['TableOfContents'], script['Content'] = self.__get_cached_content__(script_name)
+			script['TableOfContents'], script['Content'] = self.cache_handler.get_cached_content(script_name)
 
 		return script
 
