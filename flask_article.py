@@ -25,7 +25,7 @@ class CacheHandler():
 		cache_folder -- the directory for cached files (default '.cache')
 		debug -- specefies wether the handler will output debug information (default True)
 		'''
-		# TODO function docs
+		# TODO documentation
 		# TODO test performance
 		self.cache_limit = cache_limit
 		self.script_folder = script_folder
@@ -124,15 +124,19 @@ class CacheHandler():
 
 class ScriptLoader():
 	'''Loader for the scripts'''
-	def __init__(self, script_folder='scripts', cache_folder='.cache'):
+	def __init__(self, script_folder='scripts', cache_folder='.cache', caching=True):
 		'''Constructor
 
 		Keyword arguments:
 		script_folder -- the directory for your scripts (default 'scripts')
-		cache_folder -- the directory for cached files
+		cache_folder -- the directory for cached files (default '.cache')
+		caching -- specifies if caching is enabled (default True)
 		'''
 		self.script_folder = script_folder
 		self.cache_handler = CacheHandler(cache_folder = cache_folder)
+		if not caching:
+			print("Caching disabled!")
+		self.caching = caching
 
 	def render_article(self, script, template_file):
 		'''Generates a 'render_template' function call which sets all the tags
@@ -177,7 +181,7 @@ class ScriptLoader():
 			return None
 
 		# Checking cache entry
-		if not self.cache_handler.check_cache_entry(script_name):
+		if not (self.cache_handler.check_cache_entry(script_name) and self.caching):
 			# Parsing file and creating new cache entry
 			data = open(script_path + '/' + script_name).read()
 			data = data.split('\n')
@@ -214,7 +218,8 @@ class ScriptLoader():
 			self.__parse_content__(script_info)
 
 			# Caching
-			self.cache_handler.new_cache_entry(script_info)
+			if self.caching:
+				self.cache_handler.new_cache_entry(script_info)
 		else:
 			# Loading parsed contents
 			script_info = self.cache_handler.get_cached_content(script_name)	
