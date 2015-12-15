@@ -6,8 +6,7 @@ import hashlib as hl
 from datetime import date
 from flask import render_template
 
-# TODO find better newline
-TEMPLATE_NEWLINE = 'FLASK_ARTICLE_NEWLINE'
+TEMPLATE_NEWLINE = '\0'
 CACHE_SEPERATOR = '\n\0\n'
 
 class CacheHandler():
@@ -16,7 +15,7 @@ class CacheHandler():
 	It uses 2 caches, the heap (limited) and the discspace.
 	The last cached scripts are the ones in heap.
 	'''
-	def __init__(self, cache_limit=10, script_folder='scripts', cache_folder='.cache', debug=True, hash_alg='sha1'):
+	def __init__(self, script_loader, cache_limit=10, script_folder='scripts', cache_folder='.cache', debug=True, hash_alg='sha1'):
 		'''Constructor
 
 		Keyword arguments:
@@ -27,6 +26,7 @@ class CacheHandler():
 		'''
 		# TODO documentation
 		# TODO test performance
+		self.sl = script_loader
 		self.cache_limit = cache_limit
 		self.script_folder = script_folder
 		self.cache_folder = cache_folder
@@ -112,13 +112,14 @@ class CacheHandler():
 		else:
 			script = {}
 			cache_entry = open(self.cache_folder + '/' + name, 'rb').read()
-			cache_entry = cache_entry.split(CACHE_SEPERATOR.encode())
+			cache_entry = cache_entry.split(CACHE_SEPERATOR.encode())[1:]
 			for item in cache_entry:
 				item = item.split(b'\0')
 				tag = item[0].decode()
 				value = item[1].decode()
 				script[tag] = value
-			self.__parse_date__(script)
+			script['Date'] = script['Original_date']
+			self.sl.__parse_date__(script)
 			self.report('Loaded {} from disc cache'.format(name))
 			return script
 
@@ -133,7 +134,7 @@ class ScriptLoader():
 		caching -- specifies if caching is enabled (default True)
 		'''
 		self.script_folder = script_folder
-		self.cache_handler = CacheHandler(cache_folder = cache_folder)
+		self.cache_handler = CacheHandler(self, script_folder = script_folder, cache_folder = cache_folder)
 		if not caching:
 			print("Caching disabled!")
 		self.caching = caching
@@ -212,6 +213,7 @@ class ScriptLoader():
 						script_info['Title'] = script_info['Title'].title()
 				# Create a date-object (later used for sorting)
 				if rt == 'Date':
+					script_info['Original_date'] = script_info['Date']
 					self.__parse_date__(script_info)
 
 			# Final formatting
