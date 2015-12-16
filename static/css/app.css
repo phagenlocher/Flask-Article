@@ -1,7 +1,7 @@
 body {
 	
-	background-color: #252839;
-	color: #b5b5b7;
+	background-color: #3b3a36;
+	color: #b3c2bf;
 	margin-left: 21%;
 	margin-right: 21%;
 	font-family: OpenSans, Helvetica;
@@ -23,7 +23,7 @@ h1 {
 
 h2, h3, h4, h5 {
 
-	color: #f2b632;
+	color: #e9ece5;
 	margin-bottom: -0px;
 	font-family: Roboto;
 
@@ -38,7 +38,7 @@ pre {
 
 a {
 	
-	color: #677077;
+	color: white;
 	text-decoration: none;
 	transition: color 0.3s;
 	
@@ -46,7 +46,7 @@ a {
 
 a:hover {
 	
-	color: white;
+	color: #e9ece5;
 	
 }
 
