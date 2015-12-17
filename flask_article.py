@@ -19,12 +19,11 @@ class CacheHandler():
 		'''Constructor
 
 		Keyword arguments:
-		cache_limit -- how many files should be in heap-cache (default 10)
+		cache_limit -- how many files should be in heap-cache
 		script_folder -- the directory for your scripts (default 'scripts')
 		cache_folder -- the directory for cached files (default '.cache')
 		debug -- specefies wether the handler will output debug information (default True)
 		'''
-		# TODO documentation
 		# TODO test performance
 		self.sl = script_loader
 		self.cache_limit = cache_limit
@@ -275,17 +274,18 @@ class ScriptLoader():
 		script_info['Date'] = d.strftime("%d. %h %Y")
 		script_info['Date_object'] = d
 
-	def __get_scripts__(self, sort=True, key='Date_object'):
+	def __get_scripts__(self, length=0, sort=True, key='Date_object'):
 		'''Get all the scripts from the script directory and optionally sort them
 
 		Keyword arguments:
+		length -- specifies how many entries will be in the output (default 0 (all scripts))
 		sort -- if the scripts should be sorted by date (default True)
 		key -- the key to sort after (default 'Date_object')
 		'''
 		script_infos = []
 		# Get listing of all the files in the script folder
 		files = os.listdir( os.getcwd() + '/' +  self.script_folder )
-		# Getting the info for every script
+		# Go through all the files
 		for script in files:
 			info = self.__get_script_info__(script)
 			if info is not None:
@@ -294,7 +294,11 @@ class ScriptLoader():
 		# sensible.
 		if sort:
 			script_infos.sort(reverse=True, key=lambda x : x[key])
-		return script_infos
+		# If the length is 0 we will get ALL scripts
+		if length == 0:
+			return script_infos
+		else:
+			return script_infos[:length]
 
 	def __parse_content__(self, script_info, numbered=True):
 		'''Generates a table of contents and modifies an articles content
@@ -374,15 +378,16 @@ class ScriptLoader():
 		script_info['TableOfContents'] = toc
 		script_info['Content'] = content
 
-	def get_article_list(self, format_string='{} - {}', sort=True, key='Date_object'):
+	def get_article_list(self, length=0, format_string='{} - {}', sort=True, key='Date_object'):
 		'''Get a list of html-links to all the articles
 
 		Keyword arguments:
+		length -- specifies how many entries will be in the output (default 0 (all scripts))
 		format_string -- the string to use as a template for creating links to the articles (default '{} - {}')
 		sort -- if the scripts should be sorted by date (default True)
 		key -- the key to sort after (default 'Date_object')
 		'''
-		scripts = self.__get_scripts__(sort, key)
+		scripts = self.__get_scripts__(length, sort, key)
 		article_html = '';
 		for info in scripts:
 			article_html += '<a href="/' + info['Filename'] + '">' \
