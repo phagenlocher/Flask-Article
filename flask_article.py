@@ -15,7 +15,7 @@ class CacheHandler():
 	It uses 2 caches, the heap (limited) and the discspace.
 	The last cached scripts are the ones in heap.
 	'''
-	def __init__(self, script_loader, cache_limit=10, script_folder='scripts', cache_folder='.cache', debug=True, hash_alg='sha1'):
+	def __init__(self, script_loader, cache_limit=1000, script_folder='scripts', cache_folder='.cache', debug=True, hash_alg='sha1'):
 		'''Constructor
 
 		Keyword arguments:
@@ -44,6 +44,7 @@ class CacheHandler():
 		self.create_new_cache_dir()
 
 	def report(self, data):
+		'''Prints a message, if the CacheHandler is in debug-mode'''
 		if self.debug:
 			print(data)
 
@@ -57,16 +58,23 @@ class CacheHandler():
 	def new_cache_entry(self, script):
 		'''Creates a new cache entry in the cache dir for a file
 
-		The entry saves a hash of the script and the parsed toc and content.
+		The entry saves a the scripts tags, content and hash.
 		'''
 		name = script['Filename']
 		self.report("Creating new cache entry for " + name)
 
-		# Creating content
+		# Creating hash-digest of the scriptfile
 		file_data = open(self.script_folder + '/' + name, 'rb').read()
 		h = hl.new(self.hash_alg, file_data).digest()
+
+		# Creating the content that will be stored in disc cache.
+		# The produced file contains the hash and tuples of tags and
+		# corrosponding values. The tuples are seperated by the CACHE_SEPERATOR
+		# and tags and values are seperated by a zerobyte.
 		disc_content = h
 		for tag in script.keys():
+			# Only save tags, that contain strings
+			# 'Date_object' will NOT be saved in the disc cache
 			if type(script[tag]) == str:
 				disc_content += CACHE_SEPERATOR.encode() \
 								+ tag.encode() \
@@ -81,18 +89,27 @@ class CacheHandler():
 
 		# Writing cache entry to heap
 		if len(self.heap_cache) < self.cache_limit:
+			# There is still enough space in heap
 			pass
 		elif name in self.heap_cache:
+			# The entry already exists and will be overwritten
 			pass
 		else:
 			# Delete the first entry in the cache to make room for the new one
+			#
+			# TODO: Find better solution
+			#
 			del self.heap_cache[list(self.heap_cache.keys())[0]]
 		self.heap_cache[name] = (h, script)
 
 	def check_cache_entry(self, name):
 		'''Checks with the hash of a cache entry if a script has changed'''
+		# Get hash-digest of scriptfile on disc
 		file_data = open(self.script_folder + '/' + name, 'rb').read()
 		h = hl.new(self.hash_alg, file_data).digest()
+
+		# If the entry wasn't found in heap cache, the disc cache will be
+		# checked. If the entry couldn't be found, False will be returned.
 		if name in self.heap_cache:
 			# Check cache entry in heap
 			cached_h = self.heap_cache[name][0]
@@ -106,19 +123,26 @@ class CacheHandler():
 		return h == cached_h
 
 	def get_cached_content(self, name):
+		'''Returns the cached script'''
 		if name in self.heap_cache:
+			# If the entry is in the heap cache we can load it from there
 			self.report('Loaded {} from heap cache'.format(name))
 			return self.heap_cache[name][1]
 		else:
 			script = {}
+			# Reading cached file
 			cache_entry = open(self.cache_folder + '/' + name, 'rb').read()
+			# Splitting the contents into the tuples of tags and values.
+			# The first element is the hash value and can be ignored.
 			cache_entry = cache_entry.split(CACHE_SEPERATOR.encode())[1:]
+			# Creating new 
 			for item in cache_entry:
 				item = item.split(b'\0')
 				tag = item[0].decode()
 				value = item[1].decode()
 				script[tag] = value
-			script['Date'] = script['Original_date']
+			# Parsing the date again so 'Date_object' can be restored, since it
+			# was not stored in the disc cache.
 			self.sl.__parse_date__(script)
 			self.report('Loaded {} from disc cache'.format(name))
 			return script
@@ -164,6 +188,9 @@ class ScriptLoader():
 		Keyword arguments:
 		script_name -- script name
 		'''
+		#
+		# TODO: Delete this function and rename __get_script_info__
+		#
 		return self.__get_script_info__(script_name)
 
 	def __get_script_info__(self, script_name):
@@ -213,7 +240,6 @@ class ScriptLoader():
 						script_info['Title'] = script_info['Title'].title()
 				# Create a date-object (later used for sorting)
 				if rt == 'Date':
-					script_info['Original_date'] = script_info['Date']
 					self.__parse_date__(script_info)
 
 			# Final formatting
@@ -229,8 +255,23 @@ class ScriptLoader():
 		return script_info
 
 	def __parse_date__(self, script_info):
+		'''Parsing the date, saving it in a different format and saving a 
+		date-object for sorting.
+
+		Keyword Arguments:
+		script_info -- the script with the date
+		'''
+		# The unparsed date will be saved in 'Original_date'. This is done
+		# so that the file can be parsed again after caching, so we can create
+		# a new date object.
+		if 'Original_date' in script_info:
+			script_info['Date'] = script_info['Original_date']
+		else:
+			script_info['Original_date'] = script_info['Date']
+		# Parsing
 		d = script_info['Date'].split('/')
 		d = date(day=int(d[0]), month=int(d[1]), year=int(d[2]))
+		# Adding formatted date and date object
 		script_info['Date'] = d.strftime("%d. %h %Y")
 		script_info['Date_object'] = d
 
@@ -242,11 +283,15 @@ class ScriptLoader():
 		key -- the key to sort after (default 'Date_object')
 		'''
 		script_infos = []
+		# Get listing of all the files in the script folder
 		files = os.listdir( os.getcwd() + '/' +  self.script_folder )
+		# Getting the info for every script
 		for script in files:
 			info = self.__get_script_info__(script)
 			if info is not None:
 				script_infos.append(info)
+		# We can sort by any key in our script dict. The date object is the most
+		# sensible.
 		if sort:
 			script_infos.sort(reverse=True, key=lambda x : x[key])
 		return script_infos
