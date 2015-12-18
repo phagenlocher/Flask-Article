@@ -165,9 +165,9 @@ class ScriptLoader():
 		# articles, so it doesn't have to be done when the server is serving clients.
 		if caching:
 			self.cache_handler = CacheHandler(self, script_folder = script_folder, cache_folder = cache_folder, debug = debug)
-			self.get_article_list()
 			if debug:
-				print('Created cache entry for all scripts!')
+				print('Creating cache entry for all scripts...')
+			self.get_article_list()
 
 	def render_article(self, script, template_file):
 		'''Generates a 'render_template' function call which sets all the tags
