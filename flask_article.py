@@ -148,7 +148,7 @@ class CacheHandler():
 
 class ScriptLoader():
 	'''Loader for the scripts'''
-	def __init__(self, script_folder='scripts', cache_folder='.cache', caching=True):
+	def __init__(self, script_folder='scripts', cache_folder='.cache', caching=True, debug=True):
 		'''Constructor
 
 		Keyword arguments:
@@ -157,10 +157,17 @@ class ScriptLoader():
 		caching -- specifies if caching is enabled (default True)
 		'''
 		self.script_folder = script_folder
-		self.cache_handler = CacheHandler(self, script_folder = script_folder, cache_folder = cache_folder)
-		if not caching:
+		if not caching and debug:
 			print("Caching disabled!")
 		self.caching = caching
+
+		# This is done so that the cacheHandler creates cache entries for all
+		# articles, so it doesn't have to be done when the server is serving clients.
+		if caching:
+			self.cache_handler = CacheHandler(self, script_folder = script_folder, cache_folder = cache_folder, debug = debug)
+			self.get_article_list()
+			if debug:
+				print('Created cache entry for all scripts!')
 
 	def render_article(self, script, template_file):
 		'''Generates a 'render_template' function call which sets all the tags
@@ -208,7 +215,12 @@ class ScriptLoader():
 			return None
 
 		# Checking cache entry
-		if not (self.cache_handler.check_cache_entry(script_name) and self.caching):
+		if self.caching:
+			cache_entry = self.cache_handler.check_cache_entry(script_name)
+		else:
+			cache_entry = False
+
+		if not cache_entry:
 			# Parsing file and creating new cache entry
 			data = open(script_path + '/' + script_name).read()
 			data = data.split('\n')
