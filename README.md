@@ -73,6 +73,32 @@ The sections and subsections will be numbered automatically. The titles (aswell 
 
 You can use HTML-code within the scripts.
 
+## Caching
+
+The provided ScriptLoader has a builtin handler of caching at its disposal. Caching works on 2 levels. The heap- and the disc-cache. The developer can choose how many articles should be kept in heap to directly load them from there. If your webserver doesn't have any RAM to spare, you can only work with the disc-cache which is fine. 
+
+The first little performance test (done with the time-function from the time module in python) showed promising results for the heap cache.
+
+#### No caching
+| Functioncall                    | What was loaded            | Min (in seconds)                    | Max (in seconds)    |
+| ------------------------------- | -------------------------- |:-----------------------------------:| :-----------------: |
+| get_article_list()              | Articlelist of 14 articles | 0.018616437911987305                | 0.02423548698425293 |
+| get_single_script(<scriptname>) | Gigantic artile (test3)    | 0.01635575294494629                 | 0.02256631851196289 |
+
+#### Caching (creating new entry, only done once)
+| Functioncall                    | What was loaded            | Min (in seconds)                    | Max (in seconds)    |
+| ------------------------------- | -------------------------- |:-----------------------------------:| :-----------------: |
+| get_article_list()              | Articlelist of 14 articles | 0.0250241756439209                  | 0.02698349952697754 |
+| get_single_script(<scriptname>) | Gigantic artile (test3)    | 0.01963233947753906                 | 0.01976585388183593 |
+
+#### Caching (loading from heap cache)
+| Functioncall                    | What was loaded            | Min (in seconds)                    | Max (in seconds)    |
+| ------------------------------- | -------------------------- |:-----------------------------------:| :-----------------: |
+| get_article_list()              | Articlelist of 14 articles | 0.002404212951660156                | 0.00366163253784179 |
+| get_single_script(<scriptname>) | Gigantic artile (test3)    | 0.000662088394165039                | 0.00096011161804199 |
+
+This was only a short test with not much data used. It still shows promising results.
+
 ## Planned features
 
 * Compatibility to Markdown
