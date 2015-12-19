@@ -14,7 +14,7 @@ def test_script_loader(sl, iterations):
 	result = []
 	for i in range(iterations):
 		t1 = time()
-		sl.get_article_list()
+		a = sl.get_article_list()
 		t2 = time()
 		result.append(t2-t1)
 	print_result(result)

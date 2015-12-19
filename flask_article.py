@@ -320,10 +320,11 @@ class ScriptLoader():
 		numbered -- if the sections should be numbered (default True)
 		'''
 		script = script_info['Content'].split('\n')
-		if script_info['Filetype'].lower() == 'markdown':
-			script_info['Content'] = md.markdown('\n'.join(script))
-			script_info['TableOfContents'] = False
-			return
+		if 'Filetype' in script_info:
+			if script_info['Filetype'].lower() == 'markdown':
+				script_info['Content'] = md.markdown('\n'.join(script))
+				script_info['TableOfContents'] = False
+				return
 		
 		sections = []
 		section_num = 0
