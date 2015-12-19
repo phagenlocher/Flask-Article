@@ -3,10 +3,10 @@
 import os
 import shutil
 import hashlib as hl
+import markdown as md
 from datetime import date
 from flask import render_template
-
-TEMPLATE_NEWLINE = '\0'
+ 
 CACHE_SEPERATOR = '\n\0\n'
 
 class CacheHandler():
@@ -225,7 +225,7 @@ class ScriptLoader():
 			data = open(script_path + '/' + script_name).read()
 			data = data.split('\n')
 			try:
-				i = data.index('---End-Tags---')
+				i = data.index('---')
 			except:
 				return None
 				
@@ -233,7 +233,7 @@ class ScriptLoader():
 				data.remove('')
 				
 			tags = data[:i-1]
-			script_info['Content'] = TEMPLATE_NEWLINE.join(data[i:]).replace("\\\\", "</br>")
+			script_info['Content'] = '\n'.join(data[i:]).replace("\\\\", "</br>")
 
 			for tag in tags:
 				tag_name = tag[ tag.find('{')+1 : tag.find('}') ]
@@ -319,7 +319,11 @@ class ScriptLoader():
 		content -- the content to parse
 		numbered -- if the sections should be numbered (default True)
 		'''
-		script = script_info['Content'].split(TEMPLATE_NEWLINE)
+		script = script_info['Content'].split('\n')
+		if script_info['Filetype'].lower() == 'markdown':
+			script_info['Content'] = md.markdown('\n'.join(script))
+			script_info['TableOfContents'] = False
+			return
 		
 		sections = []
 		section_num = 0

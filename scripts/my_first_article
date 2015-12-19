@@ -1,10 +1,11 @@
 {Title}{Example article}
-{Description}{Example articleh}
+{Description}{Example article}
 {Keywords}{Example, Flask}
 {Date}{19/12/2015}
 {Author}{Philipp Hagenlocher}
+{Filetype}{flask-article}
 
----End-Tags---
+---
 
 * Introduction
 
@@ -24,7 +25,7 @@ The scripts use their own format which is easy to use. First of you set
 certain attributes called <em>tags</em> in your script.
 <pre>
 {Title}{Example article}\\
-{Description}{Example articleh}\\
+{Description}{Example article}\\
 {Keywords}{Example, Flask}\\
 {Date}{19/12/2015}\\
 {Author}{Philipp Hagenlocher}

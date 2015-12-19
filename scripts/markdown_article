@@ -1,0 +1,21 @@
+{Title}{Example markdown}
+{Description}{Example article in markdown}
+{Keywords}{Example, Flask}
+{Date}{19/12/2015}
+{Author}{Philipp Hagenlocher}
+{Filetype}{Markdown}
+
+---
+
+## Introduction
+
+This article was written in markdown!
+
+### How?
+
+To use markdown instead of the standard fileformat you have to use the tag 'Filetype'
+and set its value to 'Markdown' (not case sensitive).
+
+### Limitations?
+
+You will not have a table of contents with markdown (<em>yet</em>).

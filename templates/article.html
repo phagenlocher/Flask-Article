@@ -22,9 +22,11 @@
 </tr>
 </table>
 <hr>
+{% if TableOfContents %}
 <h4>Table of Contents</h4>
 {{ TableOfContents|safe }}	
-<hr>	
+<hr>
+{% endif %}
 {{ Content|safe }}		
 <hr>
 <table class="notice">
