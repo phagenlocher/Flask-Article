@@ -73,6 +73,13 @@ The sections and subsections will be numbered automatically. The titles (aswell 
 
 You can use HTML-code within the scripts.
 
+### Using Markdown
+
+It is possible to use Markdown for your content. In order to do so you need to create a 'Filetype' tag and set its value to 'Markdown' (not case sensetive) like this:
+```
+{Filetype}{Markdown}
+```
+
 ## Caching
 
 The provided ScriptLoader has a builtin handler of caching at its disposal. Caching works on 2 levels. The heap- and the disc-cache. The developer can choose how many articles should be kept in heap to directly load them from there. If your webserver doesn't have any RAM to spare, you can only work with the disc-cache which is fine. 
@@ -93,7 +100,6 @@ This was the result of test.py on a ThinkPad T410 with an SSD.
 | get_article_list()              | All test articles          | 0.024015188217163086  | 0.02435166358947754   | 0.03130984306335449 	|
 | get_single_script(<scriptname>) | One test article           | 0.0007548332214355469 | 0.0009222960472106933 | 0.0020666122436523438 |
 
+### Dynamic Caching
 
-## Planned features
-
-* Compatibility to Markdown
+**flask_article** checks if the script files have changed automatically and renews cache entries so that the content in your script file is also the content that is presented to the visitors of your website. This is done by checking fingerprints of the loaded files.
