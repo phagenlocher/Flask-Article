@@ -7,7 +7,7 @@ from flask_article import ScriptLoader
 def print_result(result):
 	print('| Min (in seconds)\t| Mean (in seconds)\t| Max (in seconds)\t|')
 	print('| --------------------- | --------------------- | --------------------- |')
-	print('|',min(result),'\t|',mean(result),'\t|',max(result),'\t|')
+	print('|',str(min(result))[:20],'\t|',str(mean(result))[:20],'\t|',str(max(result))[:20],'\t|')
 
 def test_script_loader(sl, iterations):
 	print('Timing get_article_list...')

@@ -15,11 +15,11 @@ class CacheHandler():
 	It uses 2 caches, the heap (limited) and the discspace.
 	The last cached scripts are the ones in heap.
 	'''
-	def __init__(self, script_loader, cache_limit=1000, script_folder='scripts', cache_folder='.cache', debug=True, hash_alg='sha1'):
+	def __init__(self, script_loader, cache_limit=100, script_folder='scripts', cache_folder='.cache', debug=True, hash_alg='sha1'):
 		'''Constructor
 
 		Keyword arguments:
-		cache_limit -- how many files should be in heap-cache
+		cache_limit -- how many files should be in heap-cache (default 100)
 		script_folder -- the directory for your scripts (default 'scripts')
 		cache_folder -- the directory for cached files (default '.cache')
 		debug -- specefies wether the handler will output debug information (default True)
@@ -161,12 +161,12 @@ class ScriptLoader():
 			print("Caching disabled!")
 		self.caching = caching
 
-		# This is done so that the cacheHandler creates cache entries for all
-		# articles, so it doesn't have to be done when the server is serving clients.
 		if caching:
 			self.cache_handler = CacheHandler(self, script_folder = script_folder, cache_folder = cache_folder, debug = debug)
 			if debug:
 				print('Creating cache entry for all scripts...')
+			# This is done so that the cacheHandler creates cache entries for all
+			# articles, so it doesn't have to be done when the server is serving clients.
 			self.get_article_list()
 
 	def render_article(self, script, template_file):

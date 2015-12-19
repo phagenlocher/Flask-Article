@@ -11,13 +11,30 @@
 
 This example article shows the functionality of <b>flask-article</b>.
 
-* What does it do?
+** What does it do?
 
 <b>flask-article</b> provides a flask-dev with the <em>ScriptLoader</em>. Its
 purpose is to dynamically load scripts that you put on your webserver. <b>No
 database required.</b> Performance is kept in mind by using caching to store
 the parsed scripts in memory. <em>This example page was created by <b>
 flask-article</b>.</em>
+
+** Key-Features
+
+<ul>
+<li><h4>Easy to use</h4></li>
+<b>flask-article</b> keeps ease of use in mind by having a very straightforward
+ScriptLoader object that handles everything from parsing to caching.
+<li><h4>Dynamic in the spirit of flask</h4></li>
+The reason this project was created to have a <b>dynamic way of creating articles.</b>
+This is why you can make changes to your articles, reload your page and see
+the result. This is also why you can add any tags you like to your script and
+use them however you want! Everything is kept as dynamic as possible.
+<li><h4>Automation</h4></li>
+Why do tedious task on your own? Let the computer do the work! Things like
+<b>creating a table of contents</b> or <b>numbering sections</b> is done
+automatically by the ScriptLoader.
+</ul>
 
 * How to write scripts
 
@@ -30,7 +47,9 @@ certain attributes called <em>tags</em> in your script.
 {Date}{19/12/2015}\\
 {Author}{Philipp Hagenlocher}
 </pre>
-
+You can add any tags you like to use them in your template or maybe do something
+with them internally!
+\\
 After that, you can start adding content to your page. You can even use <em>
 pure HTML</em>! 
 
@@ -72,4 +91,3 @@ You then can use the following tags in Jinja2:
 {{ SomeInfo }}
 </pre>
 The values you specified will be inserted into your HTML-template!
-

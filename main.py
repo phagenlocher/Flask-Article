@@ -5,7 +5,7 @@ from flask import render_template
 from flask_article import ScriptLoader
 
 app = Flask(__name__)
-sl = ScriptLoader(caching=False)
+sl = ScriptLoader()
 
 @app.route('/')
 def index():
