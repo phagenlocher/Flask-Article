@@ -103,3 +103,7 @@ This was the result of test.py on a ThinkPad T410 with an SSD.
 ### Dynamic Caching
 
 **flask-article** checks if the script files have changed automatically and renews cache entries so that the content in your script file is also the content that is presented to the visitors of your website. This is done by checking fingerprints of the loaded files.
+
+## Todo
+
+-Better test case to show the groupby-feature

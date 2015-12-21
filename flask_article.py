@@ -396,7 +396,7 @@ class ScriptLoader():
 		script_info['Content'] = content
 
 	def get_article_list(self, groupby=None, length=0, sort=True, key='Date_object'):
-		'''Get a list of articles or a list of lists that have grouped articles
+		'''Get a list of articles or a dict of lists that have grouped articles
 
 		Keyword arguments:
 		groupby -- groups the list into sublists by this tag
@@ -408,13 +408,20 @@ class ScriptLoader():
 		if groupby == None:
 			return scripts
 
+		# Making first entry into the dict
 		first_script = scripts.pop(0)
+		# Value for the groupby-tag : list with the first script in it
 		groups = { first_script[groupby] : [first_script] }
+
+		# For every script...
 		for script in scripts:
+			# ...check if its value is already in the dict...
 			val = script[groupby]
 			if val in groups:
+				# ...if yes, append it to the group with the same value.
 				groups[val].append(script)
 			else:
+				# ...if not, create a new list with one element, the script.
 				groups[val] = [script]
 
 		return groups
