@@ -395,19 +395,30 @@ class ScriptLoader():
 		script_info['TableOfContents'] = toc
 		script_info['Content'] = content
 
-	def get_article_list(self, length=0, format_string='{} - {}', sort=True, key='Date_object'):
-		'''Get a list of html-links to all the articles
+	def get_article_list(self, groupby=None, length=0, sort=True, key='Date_object'):
+		'''Get a list of articles or a list of lists that have grouped articles
 
 		Keyword arguments:
+		groupby -- groups the list into sublists by this tag
 		length -- specifies how many entries will be in the output (default 0 (all scripts))
-		format_string -- the string to use as a template for creating links to the articles (default '{} - {}')
 		sort -- if the scripts should be sorted by date (default True)
 		key -- the key to sort after (default 'Date_object')
 		'''
 		scripts = self.__get_scripts__(length, sort, key)
-		article_html = '';
-		for info in scripts:
-			article_html += '<a href="/' + info['Filename'] + '">' \
-			+ format_string.format(info['Date'], info['Title']) + '</a>\n'
-		return article_html
+		if groupby == None:
+			return scripts
+
+		first_script = scripts.pop(0)
+		groups = { first_script[groupby] : [first_script] }
+		for script in scripts:
+			val = script[groupby]
+			if val in groups:
+				groups[val].append(script)
+			else:
+				groups[val] = [script]
+
+		return groups
+
+
+
 		
