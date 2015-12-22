@@ -1,0 +1,117 @@
+{Title}{How the Caching works}
+{Description}{Explanation on how caching works}
+{Keywords}{Caching, flask-article}
+{Date}{22/12/2015}
+{Author}{Philipp Hagenlocher}
+{Type}{Demonstration}
+
+---
+
+* What is caching?
+
+An important question to answer is, what <em>caching even is!</em> Caching was
+invented for microprocessors like the <a href="https://en.wikipedia.org/wiki/Intel_8086">8086-family</a>.
+Their problem was the following: They had to fetch their intructions from the normal
+memory. With processors getting faster and faster this connection to the memory
+was slowing them down and creating a <b>bottleneck</b>. The cache was a special
+memory closer to the processing-unit. Is that all? <b>No!</b>\\\\
+The problem was that processors needed to be backwards-compatible. So the cache
+memory should not be a special memory that the developer can use but a <em>hidden</em>
+memory. This is also where the name comes from. \\\\
+So the <b>cache</b> is a hidden memory that generally is faster than other memories.
+
+*_ How Does It Work In flask-article?
+
+When loading a script flask-article works like this:
+<pre>
+Script -> Parsing Script -> Create Cache entry
+</pre>
+
+A <b>cache entry</b> consists of 2 parts. The ram- and the disc cache entry.
+
+** disc cache
+
+The disc cache is a directory consisting of files with the parsed scripts. A file has the
+parsed HTML, the parsed tags and the <em>fingerprint</em> in it. The fingerprint
+is a hash digest of the source file. When a script is requested flask-article
+will create a new fingerprint of the sourcefile. If the fingerprint matches
+with the one in cache, the contents are loaded from there. This saves time since
+the file doesn't have to be parsed again.
+
+**_ RAM Cache
+
+The RAM cache works in a similar fashion. It stores everything the disc cache
+stores but even more! It is capable of storing python objects like the
+date-object used for sorting. It also is much faster because this cache is just
+a python dict stored in your RAM.\\\\
+flask-article shouldn't become a memory hog though. This is why you can limit
+how many cache entries should be kept in RAM.
+
+** Retrieving data from cache
+
+To use the cache properly the class CacheHandler was introduced. The CacheHandler
+checks of the fingerprint is correct and loads the scripts from the correct
+cache. So when loading a script at first the ScriptLoader will instruct
+the CacheHandler to check if the file is in cache and if so, if the 
+fingerprint is the same. If not the source file is loaded and parsed. This is
+where a new cache entry is made. The cache entry in disc cache is always made.
+The RAM cache (as stated before) is limited.\\\\
+If the fingerprint was correct, the CacheHandler checks if the cache entry is
+in the RAM cache. If yes, it is loaded from there and if not, it is loaded
+from the disc cache.
+
+* Performance
+
+In order to test the performance gain from caching I wrote a test script and
+a test folder consisting of 30 large scripts. Running the test on a Thinkpad T410
+with a SSD resulted in this:
+\\\\
+<b>No caching</b>
+<table border="2">
+<tr>
+<td>Functioncall</td>
+<td>What was loaded</td>
+<td>Min (in seconds)</td>
+<td>Mean (in seconds)</td>
+<td>Max (in seconds)</td>
+</tr>
+<td>get_article_list()</td>
+<td>All test articles</td>
+<td>1.9138715267181396</td>
+<td>1.9623020458221436</td>
+<td>2.0416059494018555</td>
+<tr>
+</tr>
+<tr>
+<td>get_single_script(<scriptname>)</td>
+<td>One test article</td>
+<td>0.060880184173583984</td>
+<td>0.06287442207336426</td>
+<td>0.0752251148223877</td>
+</tr>
+</table>
+\\\\
+<b>Caching (loaded from ram cache)</b>
+<table border="2">
+<tr>
+<td>Functioncall</td>
+<td>What was loaded</td>
+<td>Min (in seconds)</td>
+<td>Mean (in seconds)</td>
+<td>Max (in seconds)</td>
+</tr>
+<td>get_article_list()</td>
+<td>All test articles </td>
+<td>0.024015188217163086</td>
+<td>0.02435166358947754</td>
+<td>0.03130984306335449</td>
+<tr>
+</tr>
+<tr>
+<td>get_single_script(<scriptname>)</td>
+<td>One test article</td>
+<td>0.0007548332214355469</td>
+<td>0.0009222960472106933</td>
+<td>0.0020666122436523438</td>
+</tr>
+</table>

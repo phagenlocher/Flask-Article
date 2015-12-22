@@ -408,11 +408,9 @@ class ScriptLoader():
 		if groupby == None:
 			return scripts
 
-		# Making first entry into the dict
-		first_script = scripts.pop(0)
-		# Value for the groupby-tag : list with the first script in it
-		groups = { first_script[groupby] : [first_script] }
-
+		# Since the articles are grouped in the same order as the sorted list
+		# the scripts stay sorted within their groups.
+		groups = {}
 		# For every script...
 		for script in scripts:
 			# ...check if its value is already in the dict...
@@ -423,7 +421,6 @@ class ScriptLoader():
 			else:
 				# ...if not, create a new list with one element, the script.
 				groups[val] = [script]
-
 		return groups
 
 
