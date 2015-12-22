@@ -82,9 +82,9 @@ It is possible to use Markdown for your content. In order to do so you need to c
 
 ## Caching
 
-The provided ScriptLoader has a builtin handler of caching at its disposal. Caching works on 2 levels. The heap- and the disc-cache. The developer can choose how many articles should be kept in heap to directly load them from there. If your webserver doesn't have any RAM to spare, you can only work with the disc-cache which is fine. 
+The provided ScriptLoader has a builtin handler of caching at its disposal. Caching works on 2 levels. The ram- and the disc-cache. The developer can choose how many articles should be kept in ram to directly load them from there. If your webserver doesn't have any RAM to spare, you can only work with the disc-cache which is fine. 
 
-The first little performance test showed promising results for the heap cache.
+The first little performance test showed promising results for the ram cache.
 
 This was the result of test.py on a ThinkPad T410 with an SSD.
 
@@ -94,7 +94,7 @@ This was the result of test.py on a ThinkPad T410 with an SSD.
 | get_article_list()              | All test articles          | 1.9138715267181396 	| 1.9623020458221436 	| 2.0416059494018555 	|
 | get_single_script(<scriptname>) | One test article           | 0.060880184173583984 	| 0.06287442207336426 	| 0.0752251148223877 	|
 
-#### Caching (loaded from heap cache)
+#### Caching (loaded from ram cache)
 | Functioncall                    | What was loaded            | Min (in seconds)      | Mean (in seconds)     | Max (in seconds)	|
 | ------------------------------- | -------------------------- | --------------------- | --------------------- | --------------------- |
 | get_article_list()              | All test articles          | 0.024015188217163086  | 0.02435166358947754   | 0.03130984306335449 	|
@@ -106,4 +106,4 @@ This was the result of test.py on a ThinkPad T410 with an SSD.
 
 ## Todo
 
--Better test case to show the groupby-feature
+**Better test case to show the groupby-feature**

@@ -7,20 +7,20 @@ from flask_article import ScriptLoader
 app = Flask(__name__)
 sl = ScriptLoader()
 
-'''
+
 @app.route('/')
 def index():
 	articles = sl.get_article_list()
 	article_html = '';
-	for info in scripts:
+	for info in articles:
 		article_html += '<a href="/' + info['Filename'] + '">' \
 		+ '{} - {}'.format(info['Date'], info['Title']) + '</a>\n'
 	return render_template('index.html', Articles=article_html)
-'''
 
-@app.route('/')
-def index():
-	article_groups = sl.get_article_list(groupby='Filetype')
+
+@app.route('/groupby')
+def groupby():
+	article_groups = sl.get_article_list(groupby='Type')
 
 	article_html = '';
 	for group_name in article_groups.keys():

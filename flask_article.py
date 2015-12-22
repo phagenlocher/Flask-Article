@@ -12,14 +12,14 @@ CACHE_SEPERATOR = '\n\0\n'
 class CacheHandler():
 	'''Handler for caching files
 
-	It uses 2 caches, the heap (limited) and the discspace.
-	The last cached scripts are the ones in heap.
+	It uses 2 caches, the ram (limited) and the discspace.
+	The last cached scripts are the ones in ram.
 	'''
 	def __init__(self, script_loader, cache_limit=100, script_folder='scripts', cache_folder='.cache', debug=True, hash_alg='sha1'):
 		'''Constructor
 
 		Keyword arguments:
-		cache_limit -- how many files should be in heap-cache (default 100)
+		cache_limit -- how many files should be in ram-cache (default 100)
 		script_folder -- the directory for your scripts (default 'scripts')
 		cache_folder -- the directory for cached files (default '.cache')
 		debug -- specefies wether the handler will output debug information (default True)
@@ -30,7 +30,7 @@ class CacheHandler():
 		self.script_folder = script_folder
 		self.cache_folder = cache_folder
 		self.debug = debug
-		self.heap_cache = {}
+		self.ram_cache = {}
 
 		if hash_alg in hl.algorithms_available:
 			self.hash_alg = hash_alg
@@ -86,11 +86,11 @@ class CacheHandler():
 		cache_entry = open(cache_path, 'wb')
 		cache_entry.write(disc_content)
 
-		# Writing cache entry to heap
-		if len(self.heap_cache) < self.cache_limit:
-			# There is still enough space in heap
+		# Writing cache entry to ram
+		if len(self.ram_cache) < self.cache_limit:
+			# There is still enough space in ram
 			pass
-		elif name in self.heap_cache:
+		elif name in self.ram_cache:
 			# The entry already exists and will be overwritten
 			pass
 		else:
@@ -98,8 +98,8 @@ class CacheHandler():
 			#
 			# TODO: Find better solution
 			#
-			del self.heap_cache[list(self.heap_cache.keys())[0]]
-		self.heap_cache[name] = (h, script)
+			del self.ram_cache[list(self.ram_cache.keys())[0]]
+		self.ram_cache[name] = (h, script)
 
 	def check_cache_entry(self, name):
 		'''Checks with the hash of a cache entry if a script has changed'''
@@ -107,11 +107,11 @@ class CacheHandler():
 		file_data = open(self.script_folder + '/' + name, 'rb').read()
 		h = hl.new(self.hash_alg, file_data).digest()
 
-		# If the entry wasn't found in heap cache, the disc cache will be
+		# If the entry wasn't found in ram cache, the disc cache will be
 		# checked. If the entry couldn't be found, False will be returned.
-		if name in self.heap_cache:
-			# Check cache entry in heap
-			cached_h = self.heap_cache[name][0]
+		if name in self.ram_cache:
+			# Check cache entry in ram
+			cached_h = self.ram_cache[name][0]
 		else:
 			# Check cache entry on disc
 			cache_path = self.cache_folder + '/' + name
@@ -123,10 +123,10 @@ class CacheHandler():
 
 	def get_cached_content(self, name):
 		'''Returns the cached script'''
-		if name in self.heap_cache:
-			# If the entry is in the heap cache we can load it from there
-			self.report('Loaded {} from heap cache'.format(name))
-			return self.heap_cache[name][1]
+		if name in self.ram_cache:
+			# If the entry is in the ram cache we can load it from there
+			self.report('Loaded {} from ram cache'.format(name))
+			return self.ram_cache[name][1]
 		else:
 			script = {}
 			# Reading cached file
