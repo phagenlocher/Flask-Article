@@ -7,7 +7,6 @@ from flask_article import ScriptLoader
 app = Flask(__name__)
 sl = ScriptLoader()
 
-
 @app.route('/')
 def index():
 	articles = sl.get_article_list()
@@ -24,7 +23,7 @@ def groupby():
 
 	article_html = '';
 	for group_name in article_groups.keys():
-		article_html += '<h2>{}</h2>'.format(group_name)
+		article_html += '<h3>{}</h3>'.format(group_name)
 		for info in article_groups[group_name]:
 			article_html += '<a href="/' + info['Filename'] + '">' \
 			+ '{} - {}'.format(info['Date'], info['Title']) + '</a>\n'
