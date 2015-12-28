@@ -30,10 +30,6 @@ def groupby():
 		
 	return render_template('index.html', Articles=article_html)
 
-@app.route('/contact')
-def contact():
-    return "Not done yet, don't sue"
-
 @app.route('/<article>')
 def article(article):
 	script = sl.get_single_script(article)
