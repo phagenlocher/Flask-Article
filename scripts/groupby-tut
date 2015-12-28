@@ -1,0 +1,91 @@
+{Title}{Using Groupby}
+{Description}{Tutorial on how to use the groupby feature}
+{Keywords}{Groupby, flask-article, Tutorial}
+{Date}{28/12/2015}
+{Author}{Philipp Hagenlocher}
+{Type}{Tutorial}
+
+---
+
+* General Information
+
+** What is Groupby?
+
+The <b>groupby</b> function is an important feature most commonly seen in databases.
+It splits up one set information into many sets that share a common attribute.
+Let us look at an example:
+\\
+<table border="1">
+<tr><td><b>First Name</b></td><td><b>Last Name</b></td><td><b>Age</b></td></tr>
+<tr><td>Bob</td><td>Bobbinton</td><td>30</td></tr>
+<tr><td>Liza</td><td>Lezing</td><td>40</td></tr>
+<tr><td>Henry</td><td>Henderson</td><td>30</td></tr>
+</table>
+\\
+Using the groupby function on the age will result in two seperate tables:
+\\
+<table border="1">
+<tr><td><b>First Name</b></td><td><b>Last Name</b></td><td><b>Age</b></td></tr>
+<tr><td>Bob</td><td>Bobbinton</td><td>30</td></tr>
+<tr><td>Henry</td><td>Henderson</td><td>30</td></tr>
+</table>
+\\
+<table border="1">
+<tr><td><b>First Name</b></td><td><b>Last Name</b></td><td><b>Age</b></td></tr>
+<tr><td>Liza</td><td>Lezing</td><td>40</td></tr>
+</table>
+\\
+
+The great thing you can do now is <b>aggregate!</b> You could count the tuples
+in your two sets and find out what is the most and least common age.
+
+** Why in flask-article?
+
+<em>Why does flask-article have this feature?</em>\\
+Well, I thought of a problem that could arise on my own website: What if I want
+to write an article about photography? Should it be displayed with all other
+articles about computer science in one list? This wouldn't make sense. I need
+to split them up into seperate lists that share the same category!
+
+* Using the feature
+
+The <b>groupby</b> function can be activated in the functioncall to
+<em>get_article_list</em>. Using it without parameters will return all articles
+sorted by their date.\\\\
+When grouping you have to decide <b>what tag</b> it should be grouped by.
+For this I created a special tag called 'Type' that specifies what kind of
+article the file is. If I want to group it by this tag I use the following
+functioncall <em>get_article_list(groupby='Type')</em>. It is important to note
+that the function now returns a <b>python-dict instead of a python-list</b>.
+The keys of your dictionary are the different values for the specified tag.
+For every key in this dictionary there is one list of articles stored within
+the dict.\\\\
+
+<em>Taken from main.py:</em>
+<pre>
+<code>
+@app.route('/groupby')\\
+def groupby():\\
+	article_groups = sl.get_article_list(groupby='Type')\\
+\\
+	article_html = '';\\
+	for group_name in article_groups.keys():\\
+		article_html += '&lt;h3&gt;{}&lt;/h3&gt;'.format(group_name)\\
+		for info in article_groups[group_name]:\\
+			article_html += '&lt;a href="/' + info['Filename'] + '"&gt;' \ \\
+			+ '{} - {}'.format(info['Date'], info['Title']) + '&lt;/a&gt;\n'\\
+\\
+	return render_template('index.html', Articles=article_html)\\
+</code>
+</pre>
+
+At first we iterate thru all keys and then iterate thru all articles in the
+list that exists for each key. In these for loops you could also use counting
+to rebuild aggregation functions. \\\\
+It is important to note that the groups are still sorted! The function is written
+in a way that grouping does not have any impact on the sorting!
+
+* Example
+
+An example of this function on this site can be found at
+<a href="/groupby">/groupby</a>.
