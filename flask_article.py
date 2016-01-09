@@ -199,6 +199,13 @@ class ScriptLoader():
 		#
 		return self.__get_script_info__(script_name)
 
+	def __get_local_path__(self):
+		'''Returns the absolute path to the directory this file is in at execution'''
+		# Path of this file
+		path = os.path.abspath(__file__)
+		# Cut of the file-name but not the '/'
+		return path[:path.rfind('/') + 1]
+
 	def __get_script_info__(self, script_name):
 		'''Open a script and parse its content 
 		If the script is faulty, None is returned
@@ -210,7 +217,7 @@ class ScriptLoader():
 		script_info['Filename'] = script_name
 
 		# The file couldn't be found
-		script_path = os.getcwd() + '/' + self.script_folder
+		script_path = self.__get_local_path__() + self.script_folder
 		if not script_name in os.listdir(script_path):
 			return None
 
@@ -296,7 +303,7 @@ class ScriptLoader():
 		'''
 		script_infos = []
 		# Get listing of all the files in the script folder
-		files = os.listdir( os.getcwd() + '/' +  self.script_folder )
+		files = os.listdir( self.__get_local_path__() +  self.script_folder )
 		# Go through all the files
 		for script in files:
 			info = self.__get_script_info__(script)
