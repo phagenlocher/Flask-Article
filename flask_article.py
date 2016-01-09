@@ -229,11 +229,11 @@ class ScriptLoader():
 			except:
 				return None
 				
-			while '' in data:
-				data.remove('')
+			#while '' in data:
+			#	data.remove('')
 				
 			tags = data[:i-1]
-			script_info['Content'] = '\n'.join(data[i:]).replace("\\\\", "</br>")
+			script_info['Content'] = '\n'.join(data[i:])
 
 			for tag in tags:
 				tag_name = tag[ tag.find('{')+1 : tag.find('}') ]
@@ -365,7 +365,7 @@ class ScriptLoader():
 				if index >= len(script):
 					break
 				while not script[index].startswith("*"):
-					content += script[index] + " "
+					content += script[index] + "\n"
 					index += 1
 					if index >= len(script):
 						break

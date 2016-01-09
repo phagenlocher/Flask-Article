@@ -64,18 +64,18 @@ the dict.\\\\
 <em>Taken from main.py:</em>
 <pre>
 <code>
-@app.route('/groupby')\\
-def groupby():\\
-	article_groups = sl.get_article_list(groupby='Type')\\
-\\
-	article_html = '';\\
-	for group_name in article_groups.keys():\\
-		article_html += '&lt;h3&gt;{}&lt;/h3&gt;'.format(group_name)\\
-		for info in article_groups[group_name]:\\
-			article_html += '&lt;a href="/' + info['Filename'] + '"&gt;' \ \\
-			+ '{} - {}'.format(info['Date'], info['Title']) + '&lt;/a&gt;\n'\\
-\\
-	return render_template('index.html', Articles=article_html)\\
+@app.route('/groupby')
+def groupby():
+	article_groups = sl.get_article_list(groupby='Type')
+
+	article_html = '';
+	for group_name in article_groups.keys():
+		article_html += '&lt;h3&gt;{}&lt;/h3&gt;'.format(group_name)
+		for info in article_groups[group_name]:
+			article_html += '&lt;a href="/' + info['Filename'] + '"&gt;' \ 
+			+ '{} - {}'.format(info['Date'], info['Title']) + '&lt;/a&gt;\n'
+
+	return render_template('index.html', Articles=article_html)
 </code>
 </pre>
 

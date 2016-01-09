@@ -42,10 +42,10 @@ automatically by the ScriptLoader.
 The scripts use their own format which is easy to use. First of you set
 certain attributes called <em>tags</em> in your script.
 <pre>
-{Title}{Example article}\\
-{Description}{Example article}\\
-{Keywords}{Example, Flask}\\
-{Date}{19/12/2015}\\
+{Title}{Example article}
+{Description}{Example article}
+{Keywords}{Example, Flask}
+{Date}{19/12/2015}
 {Author}{Philipp Hagenlocher}
 </pre>
 You can add any tags you like to use them in your template or maybe do something
@@ -60,8 +60,8 @@ pure HTML</em>!
 a table of contents. This is done by using <em>sections and subsections</em>.
 It looks like this:
 <pre>
- * Section\\
-\\
+ * Section
+
  ** Subsection
 </pre>
 You can use text between them however you want! The table of content will
@@ -71,8 +71,8 @@ a complex tutorial or even something bigger.
 Your sections will be titlecased automatically. If you <b>do not want this</b>
 you can add a '_' infront of your title like this:
 <pre>
- *_ Section\\
-\\
+ *_ Section
+
  **_ Subsection
 </pre>
 
@@ -82,13 +82,13 @@ Since you are using flask, you will be using Jinja2 for your templates. It is
 pretty easy. The tags you set in this script will be set with the same value
 in your Jinja2-template. Let's image you used the following tags:
 <pre>
-{AdditionalName}{ ... }\\
+{AdditionalName}{ ... }
 {SomeInfo}{ ... }
 </pre>
 You then can use the following tags in Jinja2:
 <pre>
-{{ AdditionalName }}\\
-...\\
+{{ AdditionalName }}
+...
 {{ SomeInfo }}
 </pre>
 The values you specified will be inserted into your HTML-template!
