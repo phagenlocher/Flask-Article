@@ -1,6 +1,6 @@
 {Title}{How the Caching works}
 {Description}{Explanation on how caching works}
-{Keywords}{Caching, flask-article}
+{Keywords}{Caching, Flask-Article}
 {Date}{22/12/2015}
 {Author}{Philipp Hagenlocher}
 {Type}{Demonstration}
@@ -20,9 +20,9 @@ memory should not be a special memory that the developer can use but a <em>hidde
 memory. This is also where the name comes from. \\\\
 So the <b>cache</b> is a hidden memory that generally is faster than other memories.
 
-*_ How Does It Work In flask-article?
+*_ How Does It Work In Flask-Article?
 
-When loading a script flask-article works like this:
+When loading a script Flask-Article works like this:
 <pre>
 Script -> Parsing Script -> Create Cache entry
 </pre>
@@ -33,7 +33,7 @@ A <b>cache entry</b> consists of 2 parts. The ram- and the disc cache entry.
 
 The disc cache is a directory consisting of files with the parsed scripts. A file has the
 parsed HTML, the parsed tags and the <em>fingerprint</em> in it. The fingerprint
-is a hash digest of the source file. When a script is requested flask-article
+is a hash digest of the source file. When a script is requested Flask-Article
 will create a new fingerprint of the sourcefile. If the fingerprint matches
 with the one in cache, the contents are loaded from there. This saves time since
 the file doesn't have to be parsed again.
@@ -44,7 +44,7 @@ The RAM cache works in a similar fashion. It stores everything the disc cache
 stores but even more! It is capable of storing python objects like the
 date-object used for sorting. It also is much faster because this cache is just
 a python dict stored in your RAM.\\\\
-flask-article shouldn't become a memory hog though. This is why you can limit
+Flask-Article shouldn't become a memory hog though. This is why you can limit
 how many cache entries should be kept in RAM.
 
 ** Retrieving data from cache

@@ -1,12 +1,12 @@
-# flask-article
+# Flask-Article
 
 ## What does it do?
 
-**flask-article** is a microscopic library to load scripts in an easy-to-use format in order to create articles or blog-posts without using a database. Even though it creates html code that is independent of *Flask* it is made to be used with it!
+**Flask-Article** is a microscopic library to load scripts in an easy-to-use format in order to create articles or blog-posts without using a database. Even though it creates html code that is independent of *Flask* it is made to be used with it!
 
 ## Usage
 
-By default, flask-article uses the directory **/scripts** to load the scripts for inserting the content into a HTML-template.
+By default, Flask-Article uses the directory **/scripts** to load the scripts for inserting the content into a HTML-template.
 
 The functions use the dict-datatype to return the parsed contents.
 For usual usage you should use the ScriptLoader:
@@ -102,7 +102,7 @@ This was the result of test.py on a ThinkPad T410 with an SSD.
 
 ### Dynamic Caching
 
-**flask-article** checks if the script files have changed automatically and renews cache entries so that the content in your script file is also the content that is presented to the visitors of your website. This is done by checking fingerprints of the loaded files.
+**Flask-Article** checks if the script files have changed automatically and renews cache entries so that the content in your script file is also the content that is presented to the visitors of your website. This is done by checking fingerprints of the loaded files.
 
 ## Todo
 

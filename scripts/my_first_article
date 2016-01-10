@@ -1,30 +1,30 @@
-{Title}{Introduction to flask-article}
+{Title}{Introduction to Flask-Article}
 {Description}{Example article}
 {Keywords}{Example, Flask}
 {Date}{19/12/2015}
 {Author}{Philipp Hagenlocher}
-{Filetype}{flask-article}
+{Filetype}{Flask-Article}
 {Type}{Tutorial}
 
 ---
 
 * Introduction
 
-This example article shows the functionality of <b>flask-article</b>.
+This example article shows the functionality of <b>Flask-Article</b>.
 
 ** What does it do?
 
-<b>flask-article</b> provides a flask-dev with the <em>ScriptLoader</em>. Its
+<b>Flask-Article</b> provides a flask-dev with the <em>ScriptLoader</em>. Its
 purpose is to dynamically load scripts that you put on your webserver. <b>No
 database required.</b> Performance is kept in mind by using caching to store
 the parsed scripts in memory. <em>This example page was created by <b>
-flask-article</b>.</em>
+Flask-Article</b>.</em>
 
 ** Key-Features
 
 <ul>
 <li><h4>Easy to use</h4></li>
-<b>flask-article</b> keeps ease of use in mind by having a very straightforward
+<b>Flask-Article</b> keeps ease of use in mind by having a very straightforward
 ScriptLoader object that handles everything from parsing to caching.
 <li><h4>Dynamic in the spirit of flask</h4></li>
 The reason this project was created to have a <b>dynamic way of creating articles.</b>
@@ -56,7 +56,7 @@ pure HTML</em>!
 
 ** Sections
 
-<b>flask-article</b> provides automatic numbering and automatic creating of
+<b>Flask-Article</b> provides automatic numbering and automatic creating of
 a table of contents. This is done by using <em>sections and subsections</em>.
 It looks like this:
 <pre>
