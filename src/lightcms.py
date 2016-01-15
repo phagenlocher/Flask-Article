@@ -5,7 +5,7 @@ import shutil
 import hashlib as hl
 import markdown as md
 from datetime import date
-from flask import render_template
+from jinja2 import Environment, FileSystemLoader
  
 CACHE_SEPERATOR = '\n\0\n'
 
@@ -24,7 +24,6 @@ class CacheHandler():
 		cache_folder -- the directory for cached files (default '.cache')
 		debug -- specefies wether the handler will output debug information (default True)
 		'''
-		# TODO test performance
 		self.sl = script_loader
 		self.cache_limit = cache_limit
 		self.script_folder = script_folder
@@ -170,21 +169,23 @@ class ScriptLoader():
 			self.get_article_list()
 
 	def render_article(self, script, template_file):
-		'''Generates a 'render_template' function call which sets all the tags
-		of your script. Evaluates that call and returns it.
+		'''Evaluates a function-call rendering a template file.
+		It sets the appropriate tags in that function-call.
 
 		e.g.
 		Your tags are "Author", "Title" and "Date".
 		The resulting command will be:
-		render_template(<filename>, Author = script["Author"], Title = script["Title"], Date = script["Date"])
+		template.render(Author = script["Author"], Title = script["Title"], Date = script["Date"])
 
 		Keyword arguments:
 		script -- parsed script
 		template_file -- filename of your template file
 		'''
-		func_call = 'render_template("' + template_file + '"'
+		env = Environment(loader = FileSystemLoader('./templates/'))
+		template = env.get_template(template_file)
+		func_call = 'template.render('
 		for tag in script.keys():
-			func_call += ', ' + tag + ' = script["' + tag + '"]'
+			func_call += tag + ' = script["' + tag + '"], '
 		func_call += ')'
 		return eval(func_call)
 
