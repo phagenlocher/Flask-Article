@@ -1,12 +1,12 @@
-# Flask-Article
+# Light-CMS
 
 ## What does it do?
 
-**Flask-Article** is a microscopic library to load scripts in an easy-to-use format in order to create articles or blog-posts without using a database. Even though it creates html code that is independent of *Flask* it is made to be used with it!
+**Light-CMS** is a minimalistic Flat-File-CMS capable of loading scripts in an easy-to-use format in order to create articles or blog-posts without using a database. It renders HTML-templates with Jinja2. The produced HTML code can be used with *Flask*, *Tornado* or something similar.
 
 ## Usage
 
-By default, Flask-Article uses the directory **/scripts** to load the scripts for inserting the content into a HTML-template.
+By default, Light-CMS uses the directory **/scripts** to load the scripts for inserting the content into a HTML-template.
 
 The functions use the dict-datatype to return the parsed contents.
 For usual usage you should use the ScriptLoader:
@@ -102,7 +102,7 @@ This was the result of test.py on a ThinkPad T410 with an SSD.
 
 ### Dynamic Caching
 
-**Flask-Article** checks if the script files have changed automatically and renews cache entries so that the content in your script file is also the content that is presented to the visitors of your website. This is done by checking fingerprints of the loaded files.
+**Light-CMS** checks if the script files have changed automatically and renews cache entries so that the content in your script file is also the content that is presented to the visitors of your website. This is done by checking fingerprints of the loaded files.
 
 ## Todo
 

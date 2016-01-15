@@ -1,6 +1,6 @@
 {Title}{Using Groupby}
 {Description}{Tutorial on how to use the groupby feature}
-{Keywords}{Groupby, Flask-Article, Tutorial}
+{Keywords}{Groupby, Light-CMS, Tutorial}
 {Date}{28/12/2015}
 {Author}{Philipp Hagenlocher}
 {Type}{Tutorial}
@@ -39,9 +39,9 @@ Using the groupby function on the age will result in two seperate tables:
 The great thing you can do now is <b>aggregate!</b> You could count the tuples
 in your two sets and find out what is the most and least common age.
 
-** Why in Flask-Article?
+** Why in Light-CMS?
 
-<em>Why does Flask-Article have this feature?</em>\\
+<em>Why does Light-CMS have this feature?</em>\\
 Well, I thought of a problem that could arise on my own website: What if I want
 to write an article about photography? Should it be displayed with all other
 articles about computer science in one list? This wouldn't make sense. I need
