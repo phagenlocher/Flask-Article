@@ -5,7 +5,7 @@ from flask import render_template
 from lightcms import ScriptLoader
 
 app = Flask(__name__)
-sl = ScriptLoader()
+sl = ScriptLoader(debug=True)
 
 @app.route('/')
 def index():

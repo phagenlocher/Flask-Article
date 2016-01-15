@@ -15,7 +15,7 @@ class CacheHandler():
 	It uses 2 caches, the ram (limited) and the discspace.
 	The last cached scripts are the ones in ram.
 	'''
-	def __init__(self, script_loader, cache_limit=100, script_folder='scripts', cache_folder='.cache', debug=True, hash_alg='sha1'):
+	def __init__(self, script_loader, cache_limit=100, script_folder='scripts', cache_folder='.cache', debug=False, hash_alg='sha1'):
 		'''Constructor
 
 		Keyword arguments:
@@ -147,7 +147,7 @@ class CacheHandler():
 
 class ScriptLoader():
 	'''Loader for the scripts'''
-	def __init__(self, script_folder='scripts', cache_folder='.cache', caching=True, debug=True):
+	def __init__(self, script_folder='scripts', template_path='templates/', cache_folder='.cache', caching=True, debug=False):
 		'''Constructor
 
 		Keyword arguments:
@@ -159,6 +159,8 @@ class ScriptLoader():
 		if not caching and debug:
 			print("Caching disabled!")
 		self.caching = caching
+
+		self.template_path = template_path
 
 		if caching:
 			self.cache_handler = CacheHandler(self, script_folder = script_folder, cache_folder = cache_folder, debug = debug)
@@ -181,7 +183,7 @@ class ScriptLoader():
 		script -- parsed script
 		template_file -- filename of your template file
 		'''
-		env = Environment(loader = FileSystemLoader('./templates/'))
+		env = Environment(loader = FileSystemLoader(self.template_path))
 		template = env.get_template(template_file)
 		func_call = 'template.render('
 		for tag in script.keys():
@@ -233,15 +235,12 @@ class ScriptLoader():
 			data = open(script_path + '/' + script_name).read()
 			data = data.split('\n')
 			try:
-				i = data.index('---')
+				tag_index = data.index('---')
 			except:
 				return None
 				
-			#while '' in data:
-			#	data.remove('')
-				
-			tags = data[:i-1]
-			script_info['Content'] = '\n'.join(data[i:])
+			tags = data[:tag_index-1]
+			script_info['Content'] = '\n'.join(data[tag_index:])
 
 			for tag in tags:
 				tag_name = tag[ tag.find('{')+1 : tag.find('}') ]
@@ -257,6 +256,8 @@ class ScriptLoader():
 				if rt == 'Title':
 					if not script_info['Title'].startswith('_'):
 						script_info['Title'] = script_info['Title'].title()
+					else:
+						script_info['Title'] = script_info['Title'][1:]
 				# Create a date-object (later used for sorting)
 				if rt == 'Date':
 					self.__parse_date__(script_info)

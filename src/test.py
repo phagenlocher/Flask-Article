@@ -2,7 +2,7 @@
 
 from time import time
 from statistics import mean
-from flask_article import ScriptLoader
+from lightcms import ScriptLoader
 
 def print_result(result):
 	print('| Min (in seconds)\t| Mean (in seconds)\t| Max (in seconds)\t|')
