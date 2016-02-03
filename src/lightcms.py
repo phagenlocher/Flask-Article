@@ -15,19 +15,20 @@ class CacheHandler():
 	It uses 2 caches, the ram (limited) and the discspace.
 	The last cached scripts are the ones in ram.
 	'''
-	def __init__(self, script_loader, cache_limit=100, script_folder='scripts', cache_folder='.cache', debug=False, hash_alg='sha1'):
+	def __init__(self, script_loader, cache_limit=2, script_path='scripts/', cache_path='.cache/', debug=False, hash_alg='sha1'):
 		'''Constructor
 
 		Keyword arguments:
 		cache_limit -- how many files should be in ram-cache (default 100)
-		script_folder -- the directory for your scripts (default 'scripts')
-		cache_folder -- the directory for cached files (default '.cache')
+		script_path -- the directory for your scripts (default 'scripts')
+		cache_path -- the directory for cached files (default '.cache')
 		debug -- specefies wether the handler will output debug information (default True)
+		hash_alg -- the hash algorithm to be used for checking cache entries (default 'sha1')
 		'''
 		self.sl = script_loader
 		self.cache_limit = cache_limit
-		self.script_folder = script_folder
-		self.cache_folder = cache_folder
+		self.script_path = script_path
+		self.cache_path = cache_path
 		self.debug = debug
 		self.ram_cache = {}
 
@@ -49,9 +50,9 @@ class CacheHandler():
 	def create_new_cache_dir(self):
 		'''Deletes the cache dir and creates a new empty one'''
 		self.report('Renewing cache dir')
-		if os.path.exists(self.cache_folder) and os.path.isdir(self.cache_folder):
-			shutil.rmtree(self.cache_folder)
-		os.mkdir(self.cache_folder)
+		if os.path.exists(self.cache_path) and os.path.isdir(self.cache_path):
+			shutil.rmtree(self.cache_path)
+		os.mkdir(self.cache_path)
 
 	def new_cache_entry(self, script):
 		'''Creates a new cache entry in the cache dir for a file
@@ -62,7 +63,7 @@ class CacheHandler():
 		self.report("Creating new cache entry for " + name)
 
 		# Creating hash-digest of the scriptfile
-		file_data = open(self.script_folder + '/' + name, 'rb').read()
+		file_data = open(self.script_path + name, 'rb').read()
 		h = hl.new(self.hash_alg, file_data).digest()
 
 		# Creating the content that will be stored in disc cache.
@@ -79,7 +80,7 @@ class CacheHandler():
 								+ b'\0' + script[tag].encode()
 
 		# Writing cache entry to disc
-		cache_path = self.cache_folder + '/' + name
+		cache_path = self.cache_path + name
 		if os.path.exists(cache_path):
 			os.remove(cache_path)
 		cache_entry = open(cache_path, 'wb')
@@ -93,17 +94,26 @@ class CacheHandler():
 			# The entry already exists and will be overwritten
 			pass
 		else:
-			# Delete the first entry in the cache to make room for the new one
+
 			#
-			# TODO: Find better solution
+			# TODO TESTING!!!
 			#
-			del self.ram_cache[list(self.ram_cache.keys())[0]]
-		self.ram_cache[name] = (h, script)
+
+			# Find the entry with the least hits
+			minimal_used_key = list(self.ram_cache.keys())[0]
+			for key in self.ram_cache.keys():
+				if self.ram_cache[key][2] < self.ram_cache[minimal_used_key][2]:
+					minimal_used_key = key
+			# Delete the found entry
+			del self.ram_cache[minimal_used_key]
+		# The cache entry consists of the hash, the script-data and how many hits
+		# the entry has.
+		self.ram_cache[name] = [h, script, 0]
 
 	def check_cache_entry(self, name):
 		'''Checks with the hash of a cache entry if a script has changed'''
 		# Get hash-digest of scriptfile on disc
-		file_data = open(self.script_folder + '/' + name, 'rb').read()
+		file_data = open(self.script_path + name, 'rb').read()
 		h = hl.new(self.hash_alg, file_data).digest()
 
 		# If the entry wasn't found in ram cache, the disc cache will be
@@ -113,7 +123,7 @@ class CacheHandler():
 			cached_h = self.ram_cache[name][0]
 		else:
 			# Check cache entry on disc
-			cache_path = self.cache_folder + '/' + name
+			cache_path = self.cache_path + name
 			if not os.path.exists(cache_path):
 				# The cache entry does not exist
 				return False
@@ -125,11 +135,12 @@ class CacheHandler():
 		if name in self.ram_cache:
 			# If the entry is in the ram cache we can load it from there
 			self.report('Loaded {} from ram cache'.format(name))
+			self.ram_cache[name][2] += 1
 			return self.ram_cache[name][1]
 		else:
 			script = {}
 			# Reading cached file
-			cache_entry = open(self.cache_folder + '/' + name, 'rb').read()
+			cache_entry = open(self.cache_path + name, 'rb').read()
 			# Splitting the contents into the tuples of tags and values.
 			# The first element is the hash value and can be ignored.
 			cache_entry = cache_entry.split(CACHE_SEPERATOR.encode())[1:]
@@ -143,19 +154,22 @@ class CacheHandler():
 			# was not stored in the disc cache.
 			self.sl.__parse_date__(script)
 			self.report('Loaded {} from disc cache'.format(name))
+			# Since it was loaded, it will replace the cache entry with the least cache hits
+			self.new_cache_entry(script)
 			return script
 
 class ScriptLoader():
 	'''Loader for the scripts'''
-	def __init__(self, script_folder='scripts', template_path='templates/', cache_folder='.cache', caching=True, debug=False):
+	def __init__(self, script_path='scripts/', template_path='templates/', cache_path='.cache/', caching=True, debug=False):
 		'''Constructor
 
 		Keyword arguments:
-		script_folder -- the directory for your scripts (default 'scripts')
-		cache_folder -- the directory for cached files (default '.cache')
+		script_path -- the directory for your scripts (default 'scripts/')
+		template_path -- the directory for your templates (default 'templates/')
+		cache_path -- the directory for cached files (default '.cache/')
 		caching -- specifies if caching is enabled (default True)
 		'''
-		self.script_folder = script_folder
+		self.script_path = script_path
 		if not caching and debug:
 			print("Caching disabled!")
 		self.caching = caching
@@ -163,7 +177,7 @@ class ScriptLoader():
 		self.template_path = template_path
 
 		if caching:
-			self.cache_handler = CacheHandler(self, script_folder = script_folder, cache_folder = cache_folder, debug = debug)
+			self.cache_handler = CacheHandler(self, script_path = script_path, cache_path = cache_path, debug = debug)
 			if debug:
 				print('Creating cache entry for all scripts...')
 			# This is done so that the cacheHandler creates cache entries for all
@@ -220,7 +234,7 @@ class ScriptLoader():
 		script_info['Filename'] = script_name
 
 		# The file couldn't be found
-		script_path = self.__get_local_path__() + self.script_folder
+		script_path = self.__get_local_path__() + self.script_path
 		if not script_name in os.listdir(script_path):
 			return None
 
@@ -232,7 +246,7 @@ class ScriptLoader():
 
 		if not cache_entry:
 			# Parsing file and creating new cache entry
-			data = open(script_path + '/' + script_name).read()
+			data = open(script_path + script_name).read()
 			data = data.split('\n')
 			try:
 				tag_index = data.index('---')
@@ -305,7 +319,7 @@ class ScriptLoader():
 		'''
 		script_infos = []
 		# Get listing of all the files in the script folder
-		files = os.listdir( self.__get_local_path__() +  self.script_folder )
+		files = os.listdir( self.__get_local_path__() + self.script_path )
 		# Go through all the files
 		for script in files:
 			info = self.__get_script_info__(script)
@@ -382,7 +396,7 @@ class ScriptLoader():
 				content += "\n</p>\n"
 
 		# Create table of contents
-		toc = "<ul class='toc'>\n"
+		toc = "<ul>\n"
 		single = False
 		for sec_list in sections:
 			single = False
