@@ -15,7 +15,7 @@ class CacheHandler():
 	It uses 2 caches, the ram (limited) and the discspace.
 	The last cached scripts are the ones in ram.
 	'''
-	def __init__(self, script_loader, cache_limit=2, script_path='scripts/', cache_path='.cache/', debug=False, hash_alg='sha1'):
+	def __init__(self, script_loader, cache_limit=100, script_path='scripts/', cache_path='.cache/', debug=False, hash_alg='sha1'):
 		'''Constructor
 
 		Keyword arguments:
@@ -56,8 +56,8 @@ class CacheHandler():
 
 	def new_cache_entry(self, script):
 		'''Creates a new cache entry in the cache dir for a file
-
-		The entry saves a the scripts tags, content and hash.
+		Also replaces the least hit cache entry in ram with the new entry,
+		that saves a the scripts tags, content and hash.
 		'''
 		name = script['Filename']
 		self.report("Creating new cache entry for " + name)
@@ -94,11 +94,6 @@ class CacheHandler():
 			# The entry already exists and will be overwritten
 			pass
 		else:
-
-			#
-			# TODO TESTING!!!
-			#
-
 			# Find the entry with the least hits
 			minimal_used_key = list(self.ram_cache.keys())[0]
 			for key in self.ram_cache.keys():
@@ -445,7 +440,5 @@ class ScriptLoader():
 				# ...if not, create a new list with one element, the script.
 				groups[val] = [script]
 		return groups
-
-
 
 		
